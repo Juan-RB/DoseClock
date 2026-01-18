@@ -1,0 +1,178 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="{% if alto_contraste %}alto-contraste{% endif %}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DoseClock - Gestion de medicamentos">
+  <meta name="theme-color" content="#667eea">
+  <title>{% block title %}DoseClock{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  {% if modo_visual == 'minimalista' %}
+  <link rel="stylesheet" href="{% static 'css/modo_minimalista.css' %}">
+  {% else %}
+  <link rel="stylesheet" href="{% static 'css/modo_avanzado.css' %}">
+  {% endif %}
+  <link rel="stylesheet" href="{% static 'css/accesibilidad.css' %}">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="paleta-{{ paleta }} texto-{{ tamano_texto }}">
+  <!-- Skip to main content for accessibility -->
+  <a href="#main-content" class="skip-link visually-hidden-focusable">
+    Saltar al contenido principal
+  </a>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom" role="navigation" aria-label="Navegacion principal">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'medicamentos:dashboard' %}">
+        <i class="bi bi-capsule me-2" aria-hidden="true"></i>
+        <span>DoseClock</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Alternar navegacion">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+               href="{% url 'medicamentos:dashboard' %}"
+               {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>
+              <i class="bi bi-house-door me-1" aria-hidden="true"></i> Inicio
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'medicamento' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'medicamentos:medicamentos_list' %}">
+              <i class="bi bi-capsule me-1" aria-hidden="true"></i> Medicamentos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'tratamiento' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'medicamentos:tratamientos_list' %}">
+              <i class="bi bi-clipboard2-pulse me-1" aria-hidden="true"></i> Tratamientos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'historial' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'medicamentos:historial_tomas' %}">
+              <i class="bi bi-clock-history me-1" aria-hidden="true"></i> Historial
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'calendario' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'medicamentos:calendario' %}">
+              <i class="bi bi-calendar3 me-1" aria-hidden="true"></i> Calendario
+            </a>
+          </li>
+        </ul>
+
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link {% if 'configuracion' in request.resolver_match.url_name %}active{% endif %}"
+               href="{% url 'medicamentos:configuracion' %}"
+               aria-label="Configuracion">
+              <i class="bi bi-gear me-1" aria-hidden="true"></i>
+              <span class="d-lg-none">Configuracion</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main-content" class="container py-4" role="main">
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages mb-3" role="alert" aria-live="polite">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer mt-auto py-3 bg-light" role="contentinfo">
+    <div class="container text-center">
+      <span class="text-muted">DoseClock - Tu asistente de medicamentos</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="{% static 'js/cronometro.js' %}"></script>
+  <script src="{% static 'js/notificaciones.js' %}"></script>
+
+  <!-- Telegram Reminder Service -->
+  <script>
+    // Verificar y enviar recordatorios de Telegram cada 60 segundos
+    (function() {
+      const TELEGRAM_CHECK_INTERVAL = 60000; // 60 segundos
+      
+      async function checkTelegramReminders() {
+        try {
+          const response = await fetch('/api/telegram/check-reminders/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.reminders_sent && data.reminders_sent.total > 0) {
+              console.log(`[Telegram] Recordatorios enviados: ${data.reminders_sent.total}`);
+              console.log(`  - Anticipados: ${data.reminders_sent.anticipados}`);
+              console.log(`  - Hora exacta: ${data.reminders_sent.exactos}`);
+            }
+          }
+        } catch (error) {
+          console.error('[Telegram] Error verificando recordatorios:', error);
+        }
+      }
+      
+      // Ejecutar inmediatamente al cargar
+      checkTelegramReminders();
+      
+      // Programar verificaciones periódicas
+      setInterval(checkTelegramReminders, TELEGRAM_CHECK_INTERVAL);
+      
+      console.log('[Telegram] Servicio de recordatorios iniciado (cada 60s)');
+    })();
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW registration failed'));
+    }
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

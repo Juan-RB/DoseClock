@@ -1,0 +1,82 @@
+﻿{% extends 'medicamentos/base.html' %}
+
+{% block title %}{{ title }} - DoseClock{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h1 class="h4 mb-0">
+          <i class="bi bi-capsule me-2" aria-hidden="true"></i>
+          {{ title }}
+        </h1>
+      </div>
+      
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          
+          <!-- Nombre -->
+          <div class="mb-3">
+            <label for="id_nombre" class="form-label">
+              Nombre del medicamento <span class="text-danger">*</span>
+            </label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.nombre.errors.0 }}
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Color -->
+          <div class="mb-3">
+            <label for="id_color" class="form-label">
+              Color identificador
+            </label>
+            <div class="d-flex align-items-center gap-3">
+              {{ form.color }}
+              <span class="color-preview rounded-circle" 
+                    id="color-preview"
+                    style="width: 40px; height: 40px; background-color: {{ form.color.value|default:'#667eea' }}; display: inline-block;">
+              </span>
+            </div>
+            <small class="text-muted">Elige un color para identificar fó¡cilmente este medicamento</small>
+          </div>
+          
+          <!-- Notas -->
+          <div class="mb-4">
+            <label for="id_notas" class="form-label">
+              Notas adicionales
+            </label>
+            {{ form.notas }}
+            <small class="text-muted">Informació³n adicional sobre el medicamento (opcional)</small>
+          </div>
+          
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'medicamentos:medicamentos_list' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Update color preview when color input changes
+  document.getElementById('id_color')?.addEventListener('input', function(e) {
+    document.getElementById('color-preview').style.backgroundColor = e.target.value;
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,381 @@
+/* ==========================================
+   DoseClock - Accessibility Styles
+   ========================================== */
+
+/* ==========================================
+   Text Size Settings
+   ========================================== */
+
+.texto-normal {
+  font-size: 1rem;
+}
+
+.texto-grande {
+  font-size: 1.15rem;
+}
+
+.texto-grande h1, .texto-grande .h1 { font-size: 2.5rem; }
+.texto-grande h2, .texto-grande .h2 { font-size: 2rem; }
+.texto-grande h3, .texto-grande .h3 { font-size: 1.75rem; }
+.texto-grande h4, .texto-grande .h4 { font-size: 1.5rem; }
+.texto-grande h5, .texto-grande .h5 { font-size: 1.25rem; }
+.texto-grande .btn { font-size: 1.1rem; padding: 0.6rem 1.2rem; }
+.texto-grande .form-control, .texto-grande .form-select { font-size: 1.1rem; }
+.texto-grande .small, .texto-grande small { font-size: 0.95rem; }
+
+.texto-muy_grande {
+  font-size: 1.3rem;
+}
+
+.texto-muy_grande h1, .texto-muy_grande .h1 { font-size: 3rem; }
+.texto-muy_grande h2, .texto-muy_grande .h2 { font-size: 2.5rem; }
+.texto-muy_grande h3, .texto-muy_grande .h3 { font-size: 2rem; }
+.texto-muy_grande h4, .texto-muy_grande .h4 { font-size: 1.75rem; }
+.texto-muy_grande h5, .texto-muy_grande .h5 { font-size: 1.5rem; }
+.texto-muy_grande .btn { font-size: 1.25rem; padding: 0.75rem 1.5rem; }
+.texto-muy_grande .form-control, .texto-muy_grande .form-select { font-size: 1.25rem; padding: 0.75rem; }
+.texto-muy_grande .small, .texto-muy_grande small { font-size: 1.1rem; }
+.texto-muy_grande .countdown-display { font-size: 3rem; }
+.texto-muy_grande .navbar-brand { font-size: 1.5rem; }
+
+/* ==========================================
+   High Contrast Mode
+   ========================================== */
+
+.alto-contraste,
+.alto-contraste body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .card,
+.alto-contraste .modal-content {
+  background-color: #1a1a1a !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .card-header {
+  background-color: #333333 !important;
+  border-bottom: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .card-footer {
+  background-color: #333333 !important;
+  border-top: 2px solid #ffffff !important;
+}
+
+.alto-contraste .navbar-custom {
+  background: #000000 !important;
+  border-bottom: 3px solid #ffffff !important;
+}
+
+.alto-contraste .navbar-brand,
+.alto-contraste .nav-link {
+  color: #ffffff !important;
+}
+
+.alto-contraste .nav-link:hover,
+.alto-contraste .nav-link.active {
+  color: #ffff00 !important;
+  text-decoration: underline;
+}
+
+.alto-contraste .text-muted {
+  color: #cccccc !important;
+}
+
+.alto-contraste .btn-primary {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  font-weight: bold;
+}
+
+.alto-contraste .btn-primary:hover,
+.alto-contraste .btn-primary:focus {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.alto-contraste .btn-success {
+  background-color: #00ff00 !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  font-weight: bold;
+}
+
+.alto-contraste .btn-danger {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+.alto-contraste .btn-outline-primary,
+.alto-contraste .btn-outline-secondary {
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .btn-outline-primary:hover,
+.alto-contraste .btn-outline-secondary:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.alto-contraste .form-control,
+.alto-contraste .form-select {
+  background-color: #1a1a1a !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .form-control:focus,
+.alto-contraste .form-select:focus {
+  border-color: #ffff00 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 0, 0.5) !important;
+}
+
+.alto-contraste .form-control::placeholder {
+  color: #999999 !important;
+}
+
+.alto-contraste .form-check-input {
+  border: 2px solid #ffffff !important;
+  background-color: #1a1a1a !important;
+}
+
+.alto-contraste .form-check-input:checked {
+  background-color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
+.alto-contraste .table {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.alto-contraste .table thead {
+  background-color: #333333 !important;
+}
+
+.alto-contraste .table-hover tbody tr:hover {
+  background-color: #333333 !important;
+}
+
+.alto-contraste .progress {
+  background-color: #333333 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.alto-contraste .badge {
+  border: 1px solid #ffffff !important;
+}
+
+.alto-contraste .footer {
+  background-color: #000000 !important;
+  border-top: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.alto-contraste .countdown-container {
+  background: #333333 !important;
+  border: 2px solid #ffffff !important;
+}
+
+.alto-contraste .countdown-display {
+  color: #ffff00 !important;
+}
+
+.alto-contraste a {
+  color: #00ffff !important;
+}
+
+.alto-contraste a:hover {
+  color: #ffff00 !important;
+  text-decoration: underline !important;
+}
+
+/* ==========================================
+   Status Colors with Icons (Not Color-Only)
+   ========================================== */
+
+/* Green Status - Confirmed */
+.status-confirmed,
+[data-status="confirmada"] {
+  background-color: var(--dc-status-confirmed) !important;
+}
+
+.status-confirmed::before,
+[data-status="confirmada"]::before {
+  content: "✓ ";
+}
+
+/* Orange Status - Late */
+.status-late,
+[data-status="tarde"] {
+  background-color: var(--dc-status-late) !important;
+}
+
+.status-late::before,
+[data-status="tarde"]::before {
+  content: "⚠ ";
+}
+
+/* Red Status - Missed */
+.status-missed,
+[data-status="no_tomada"] {
+  background-color: var(--dc-status-missed) !important;
+}
+
+.status-missed::before,
+[data-status="no_tomada"]::before {
+  content: "✗ ";
+}
+
+/* Gray Status - Pending */
+.status-pending,
+[data-status="pendiente"] {
+  background-color: var(--dc-status-pending) !important;
+}
+
+.status-pending::before,
+[data-status="pendiente"]::before {
+  content: "◯ ";
+}
+
+/* ==========================================
+   Focus Indicators
+   ========================================== */
+
+*:focus {
+  outline: 3px solid var(--dc-primary) !important;
+  outline-offset: 2px;
+}
+
+.alto-contraste *:focus {
+  outline: 3px solid #ffff00 !important;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   Reduced Motion
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .countdown-display.urgent {
+    animation: none !important;
+  }
+  
+  .btn-confirm-dose:not(:disabled) {
+    animation: none !important;
+  }
+}
+
+/* ==========================================
+   Screen Reader Only Text
+   ========================================== */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================
+   Touch Targets (min 44x44px)
+   ========================================== */
+
+.btn,
+.nav-link,
+.form-check-input,
+a[role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.btn-sm {
+  min-height: 38px;
+  min-width: 38px;
+}
+
+/* ==========================================
+   Link Visibility
+   ========================================== */
+
+a:not(.btn):not(.nav-link) {
+  text-decoration: underline;
+}
+
+a:not(.btn):not(.nav-link):hover {
+  text-decoration: none;
+}
+
+/* ==========================================
+   Form Labels
+   ========================================== */
+
+label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.form-label {
+  display: block;
+}
+
+/* Required Field Indicator */
+.required::after {
+  content: " *";
+  color: var(--dc-danger);
+}
+
+/* ==========================================
+   Error Messages
+   ========================================== */
+
+.invalid-feedback {
+  font-weight: 500;
+}
+
+.alto-contraste .invalid-feedback {
+  color: #ff6666 !important;
+}
+
+/* ==========================================
+   Loading States
+   ========================================== */
+
+[aria-busy="true"] {
+  cursor: wait;
+}
+
+.spinner-border {
+  border-width: 0.2em;
+}
+
+/* ==========================================
+   Landmark Regions
+   ========================================== */
+
+[role="main"],
+[role="navigation"],
+[role="contentinfo"] {
+  display: block;
+}

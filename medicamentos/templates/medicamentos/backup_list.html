@@ -1,0 +1,81 @@
+﻿{% extends 'medicamentos/base.html' %}
+
+{% block title %}Backups - DoseClock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h2">
+    <i class="bi bi-cloud-arrow-down me-2 text-primary" aria-hidden="true"></i>
+    Copias de Seguridad
+  </h1>
+  <form method="post" action="{% url 'medicamentos:backup_create' %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+      Crear Backup
+    </button>
+  </form>
+</div>
+
+{% if backups %}
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Archivo</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Tamaó±o</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for backup in backups %}
+      <tr>
+        <td>
+          <i class="bi bi-file-earmark-zip me-2" aria-hidden="true"></i>
+          {{ backup.filename }}
+        </td>
+        <td>{{ backup.modified|date:"d/m/Y H:i" }}</td>
+        <td>{{ backup.size_bytes|filesizeformat }}</td>
+        <td>
+          {% if backup.valid %}
+          <span class="badge bg-success">Vó¡lido</span>
+          {% else %}
+          <span class="badge bg-danger">Invó¡lido</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="btn-group btn-group-sm">
+            <a href="{% url 'medicamentos:backup_download' backup.filename %}" 
+               class="btn btn-outline-primary" title="Descargar">
+              <i class="bi bi-download" aria-hidden="true"></i>
+            </a>
+            {% if backup.valid %}
+            <a href="{% url 'medicamentos:backup_restore' backup.filename %}" 
+               class="btn btn-outline-warning" title="Restaurar">
+              <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+            <form method="post" action="{% url 'medicamentos:backup_delete' backup.filename %}" 
+                  class="d-inline" onsubmit="return confirm('¿Eliminar este backup?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger" title="Eliminar">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-cloud-arrow-down display-1 text-muted mb-3" aria-hidden="true"></i>
+  <h2 class="h4 text-muted">No hay copias de seguridad</h2>
+  <p class="text-muted mb-4">Crea tu primera copia de seguridad para proteger tus datos.</p>
+</div>
+{% endif %}
+{% endblock %}

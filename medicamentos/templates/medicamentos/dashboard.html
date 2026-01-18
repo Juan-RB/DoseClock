@@ -1,0 +1,475 @@
+{% extends 'medicamentos/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - DoseClock{% endblock %}
+
+{% block extra_css %}
+{% if modo_visual == 'avanzado' %}
+<style>
+  /* Pillbox Wrapper */
+  .pillbox-wrapper {
+    margin-bottom: 2rem;
+  }
+  
+  .pillbox-title {
+    color: var(--dc-text-primary);
+    font-weight: 600;
+  }
+  
+  /* Pillbox Grid */
+  .pillbox {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+    border-radius: 1.5rem;
+    box-shadow: 10px 10px 20px #d4d4d4, -10px -10px 20px #ffffff;
+  }
+  
+  /* Day Column */
+  .pillbox-day {
+    background: linear-gradient(145deg, #ffffff, #e8e8e8);
+    border-radius: 1rem;
+    padding: 0.75rem;
+    box-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff;
+    transition: transform 0.3s ease;
+  }
+  
+  .pillbox-day:hover {
+    transform: translateY(-3px);
+  }
+  
+  .pillbox-day.today {
+    border: 2px solid var(--dc-primary);
+    background: linear-gradient(145deg, #f0f4ff, #e8ecff);
+  }
+  
+  .day-header {
+    text-align: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .day-name {
+    display: block;
+    font-weight: bold;
+    color: var(--dc-primary);
+    font-size: 0.85rem;
+  }
+  
+  .day-num {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dc-text-primary);
+  }
+  
+  /* Compartments */
+  .day-compartments {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .pill-compartment {
+    aspect-ratio: 1;
+    background: linear-gradient(145deg, #f0f0f0, #d9d9d9);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    box-shadow: inset 3px 3px 6px #c9c9c9, inset -3px -3px 6px #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 50px;
+  }
+  
+  .pill-compartment:hover {
+    background: linear-gradient(145deg, #e8e8e8, #d0d0d0);
+  }
+  
+  .pill-compartment.has-doses {
+    background: linear-gradient(145deg, #fff5f5, #ffe8e8);
+    box-shadow: inset 2px 2px 4px #e8d0d0, inset -2px -2px 4px #ffffff;
+  }
+  
+  .pill-compartment.taken {
+    background: linear-gradient(145deg, #f0fff0, #e0ffe0);
+    box-shadow: inset 2px 2px 4px #c0e0c0, inset -2px -2px 4px #ffffff;
+  }
+  
+  .slot-icon {
+    font-size: 1rem;
+    color: #999;
+    margin-bottom: 0.25rem;
+  }
+  
+  .pill-compartment.has-doses .slot-icon {
+    color: var(--dc-primary);
+  }
+  
+  .pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    justify-content: center;
+  }
+  
+  .dose-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--dc-primary);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 3D Pill */
+  .pill-3d {
+    width: 24px;
+    height: 12px;
+    border-radius: 50px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: float 3s ease-in-out infinite;
+    cursor: pointer;
+  }
+  
+  .pill-3d::before,
+  .pill-3d::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 100%;
+  }
+  
+  .pill-3d::before {
+    left: 0;
+    border-radius: 50px 0 0 50px;
+    background: linear-gradient(to bottom, #667eea 0%, #5a6fd6 100%);
+  }
+  
+  .pill-3d::after {
+    right: 0;
+    border-radius: 0 50px 50px 0;
+    background: linear-gradient(to bottom, #f093fb 0%, #e080eb 100%);
+  }
+  
+  /* Pill Color Variants */
+  .pill-3d.pill-color-2::before { background: linear-gradient(to bottom, #4facfe, #3d9be8); }
+  .pill-3d.pill-color-2::after { background: linear-gradient(to bottom, #43e97b, #38d96e); }
+  
+  .pill-3d.pill-color-3::before { background: linear-gradient(to bottom, #fa709a, #e8608a); }
+  .pill-3d.pill-color-3::after { background: linear-gradient(to bottom, #fee140, #ecd138); }
+  
+  /* Pill States */
+  .pill-3d.taken {
+    opacity: 0.4;
+    animation: none;
+    transform: scale(0.8);
+  }
+  
+  .pill-3d.missed {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    animation: none;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotateX(0); }
+    50% { transform: translateY(-3px) rotateX(10deg); }
+  }
+  
+  .pill-taken-animation {
+    animation: pill-drop 0.5s ease-out forwards !important;
+  }
+  
+  @keyframes pill-drop {
+    0% { transform: translateY(0) rotate(0); opacity: 1; }
+    100% { transform: translateY(30px) rotate(180deg); opacity: 0; }
+  }
+  
+  /* Responsive */
+  @media (max-width: 992px) {
+    .pillbox {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .pillbox {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .pill-compartment {
+      min-height: 60px;
+    }
+  }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap">
+    <div>
+      <h1 class="h2 mb-1">
+        <i class="bi bi-heart-pulse me-2 text-primary" aria-hidden="true"></i>
+        Mi Dashboard
+      </h1>
+      <p class="text-muted mb-0">{{ total_active }} tratamiento{{ total_active|pluralize:"s" }} activo{{ total_active|pluralize:"s" }}</p>
+    </div>
+    <div class="mt-2 mt-md-0">
+      <a href="{% url 'medicamentos:tratamiento_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+        Nuevo Tratamiento
+      </a>
+    </div>
+  </div>
+</div>
+
+{% if modo_visual == 'avanzado' and cards %}
+<!-- 3D Pillbox for Advanced Mode -->
+<div id="pillbox-container" class="mb-4">
+  <!-- Pillbox will be rendered here by JavaScript -->
+  <div class="pillbox-wrapper">
+    <h3 class="pillbox-title mb-3">
+      <i class="bi bi-grid-3x3-gap me-2"></i>
+      Pastillero Semanal 3D
+    </h3>
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if cards %}
+<!-- Medication Cards -->
+<div class="row g-4" id="medication-cards">
+  {% for card in cards %}
+  <div class="col-12 col-md-6 col-lg-4">
+    <article class="card medication-card h-100 shadow-sm"
+             data-dose-id="{{ card.dose.id }}"
+             data-scheduled="{{ card.next_dose|date:'c' }}"
+             aria-label="Tarjeta de {{ card.medication.nombre }}">
+
+      <!-- Card Header -->
+      <div class="card-header d-flex justify-content-between align-items-center"
+           style="border-left: 5px solid {{ card.medication.color|default:'#667eea' }};">
+        <h2 class="h5 mb-0">
+          <i class="bi bi-capsule me-2" aria-hidden="true"></i>
+          {{ card.medication.nombre }}
+        </h2>
+        <span class="badge bg-{{ card.treatment.estado }}">
+          {{ card.treatment.get_estado_display }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <!-- Countdown Timer -->
+        <div class="countdown-container text-center mb-3 p-3 rounded">
+          <p class="text-muted small mb-1">Proxima toma en:</p>
+          <div class="countdown-display h2 mb-0 font-monospace"
+               id="countdown-{{ card.dose.id }}"
+               data-seconds="{{ card.time_info.total_seconds }}">
+            {{ card.countdown }}
+          </div>
+          <p class="text-muted small mt-1">
+            <i class="bi bi-clock me-1"></i>
+            {{ card.next_dose|date:"d/m/Y H:i" }}
+          </p>
+        </div>
+
+        <!-- Frequency Info -->
+        <div class="d-flex justify-content-between text-muted small mb-3">
+          <span>
+            <i class="bi bi-arrow-repeat me-1"></i>
+            Cada {{ card.treatment.frecuencia_horas }}h
+          </span>
+          <span>
+            {% if card.treatment.es_indefinido %}
+              <i class="bi bi-infinity me-1"></i> Indefinido
+            {% else %}
+              <i class="bi bi-calendar-range me-1"></i> {{ card.treatment.duracion_dias }} dias
+            {% endif %}
+          </span>
+        </div>
+
+        <!-- Status Summary -->
+        <div class="status-summary mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="text-muted">Adherencia</small>
+            <small class="fw-bold">{{ card.status_summary.adherence_rate }}%</small>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-success" style="width: {{ card.status_summary.adherence_rate }}%;"></div>
+          </div>
+          <div class="d-flex justify-content-between mt-2 small">
+            <span class="text-success">
+              <i class="bi bi-check-circle-fill me-1"></i>{{ card.status_summary.confirmed_on_time }}
+            </span>
+            <span class="text-warning">
+              <i class="bi bi-exclamation-circle-fill me-1"></i>{{ card.status_summary.confirmed_late }}
+            </span>
+            <span class="text-danger">
+              <i class="bi bi-x-circle-fill me-1"></i>{{ card.status_summary.missed }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Confirmation Button -->
+        <div class="d-grid gap-2">
+          {% if card.can_confirm and card.dose.estado == 'pendiente' %}
+          <button class="btn btn-success btn-confirm-dose" data-dose-id="{{ card.dose.id }}">
+            <i class="bi bi-check-lg me-1"></i> Confirmar Toma
+          </button>
+          {% elif card.dose.estado == 'pendiente' %}
+          <button class="btn btn-secondary" disabled>
+            <i class="bi bi-hourglass-split me-1"></i> {{ card.window_message }}
+          </button>
+          {% elif card.dose.estado == 'confirmada' %}
+          <button class="btn btn-outline-success" disabled>
+            <i class="bi bi-check-circle-fill me-1"></i> Confirmada
+          </button>
+          {% elif card.dose.estado == 'tarde' %}
+          <button class="btn btn-outline-warning" disabled>
+            <i class="bi bi-exclamation-circle-fill me-1"></i> Confirmada tarde
+          </button>
+          {% else %}
+          <button class="btn btn-outline-danger" disabled>
+            <i class="bi bi-x-circle-fill me-1"></i> No tomada
+          </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer bg-transparent">
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'medicamentos:historial_tratamiento' card.treatment.id %}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-clock-history me-1"></i> Historial
+          </a>
+          <a href="{% url 'medicamentos:tratamiento_detail' card.treatment.id %}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-info-circle me-1"></i> Detalles
+          </a>
+        </div>
+      </div>
+    </article>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="text-center py-5">
+  <div class="empty-state">
+    <i class="bi bi-capsule display-1 text-muted mb-3"></i>
+    <h2 class="h4 text-muted">No hay tratamientos activos</h2>
+    <p class="text-muted mb-4">Comienza agregando un medicamento y creando tu primer tratamiento.</p>
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+      <a href="{% url 'medicamentos:medicamento_create' %}" class="btn btn-outline-primary">
+        <i class="bi bi-plus-lg me-1"></i> Agregar Medicamento
+      </a>
+      <a href="{% url 'medicamentos:tratamiento_create' %}" class="btn btn-primary">
+        <i class="bi bi-clipboard2-plus me-1"></i> Crear Tratamiento
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if modo_visual == 'avanzado' %}
+<script src="{% static 'js/pastillero.js' %}"></script>
+{% endif %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeCountdowns();
+    setInterval(updateCountdowns, 1000);
+    setInterval(checkStatusUpdates, 60000);
+    setupConfirmButtons();
+  });
+
+  function setupConfirmButtons() {
+    document.querySelectorAll('.btn-confirm-dose').forEach(button => {
+      button.addEventListener('click', function() {
+        confirmDose(this.dataset.doseId, this);
+      });
+    });
+  }
+
+  // Allow pillbox to trigger confirmations
+  window.confirmDoseFromPillbox = function(doseId) {
+    const button = document.querySelector(`[data-dose-id="${doseId}"].btn-confirm-dose`);
+    if (button) {
+      confirmDose(doseId, button);
+    } else {
+      // Direct API call
+      fetch(`/api/confirmar-toma/${doseId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCsrfToken()
+        }
+      }).then(() => setTimeout(() => location.reload(), 500));
+    }
+  };
+
+  function confirmDose(doseId, button) {
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Confirmando...';
+
+    fetch(`/api/confirmar-toma/${doseId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCsrfToken()
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        button.classList.remove('btn-success');
+        button.classList.add('btn-outline-success');
+        button.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Confirmada!';
+        setTimeout(() => location.reload(), 1500);
+      }
+    })
+    .catch(error => {
+      button.disabled = false;
+      button.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar Toma';
+      alert('Error al confirmar. Intenta de nuevo.');
+    });
+  }
+
+  function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+           document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+  }
+
+  function checkStatusUpdates() {
+    fetch('/api/actualizar-estados/')
+      .then(response => response.json())
+      .then(data => {
+        if (data.updated_count > 0) location.reload();
+      });
+  }
+</script>
+{% endblock %}

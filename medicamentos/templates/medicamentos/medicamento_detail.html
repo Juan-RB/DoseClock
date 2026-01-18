@@ -1,0 +1,137 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}{{ medicamento.nombre }} - DoseClock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="{% url 'medicamentos:dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'medicamentos:medicamentos_list' %}">Medicamentos</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ medicamento.nombre }}</li>
+      </ol>
+    </nav>
+    <h1 class="h2 mb-0">
+      <span class="badge rounded-pill p-2 me-2" style="background-color: {{ medicamento.color|default:'#667eea' }};">
+        <i class="bi bi-capsule"></i>
+      </span>
+      {{ medicamento.nombre }}
+    </h1>
+  </div>
+  <div class="btn-group">
+    <a href="{% url 'medicamentos:medicamento_edit' medicamento.pk %}" class="btn btn-outline-primary">
+      <i class="bi bi-pencil me-1"></i> Editar
+    </a>
+    <a href="{% url 'medicamentos:medicamento_delete' medicamento.pk %}" class="btn btn-outline-danger">
+      <i class="bi bi-trash me-1"></i> Eliminar
+    </a>
+  </div>
+</div>
+
+<!-- Medication Info -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header">
+    <h2 class="h5 mb-0">Informacion del Medicamento</h2>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Nombre</h3>
+        <p class="mb-0 fs-5">{{ medicamento.nombre }}</p>
+      </div>
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Color identificador</h3>
+        <p class="mb-0">
+          <span class="badge p-2" style="background-color: {{ medicamento.color|default:'#667eea' }};">
+            {{ medicamento.color|default:'Sin color' }}
+          </span>
+        </p>
+      </div>
+      {% if medicamento.notas %}
+      <div class="col-12">
+        <h3 class="h6 text-muted">Notas</h3>
+        <p class="mb-0">{{ medicamento.notas }}</p>
+      </div>
+      {% endif %}
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Creado</h3>
+        <p class="mb-0 text-muted">{{ medicamento.fecha_creacion|date:"d/m/Y H:i" }}</p>
+      </div>
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Actualizado</h3>
+        <p class="mb-0 text-muted">{{ medicamento.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Associated Treatments -->
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0">
+      <i class="bi bi-clipboard2-pulse me-2"></i>
+      Tratamientos Asociados
+    </h2>
+    <a href="{% url 'medicamentos:tratamiento_create' %}" class="btn btn-sm btn-primary">
+      <i class="bi bi-plus-lg me-1"></i> Nuevo Tratamiento
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if tratamientos %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Frecuencia</th>
+            <th>Duracion</th>
+            <th>Inicio</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tratamiento in tratamientos %}
+          <tr>
+            <td>Cada {{ tratamiento.frecuencia_horas }}h</td>
+            <td>
+              {% if tratamiento.es_indefinido %}
+                <i class="bi bi-infinity"></i> Indefinido
+              {% else %}
+                {{ tratamiento.duracion_dias }} dias
+              {% endif %}
+            </td>
+            <td>{{ tratamiento.fecha_hora_inicio|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge bg-{{ tratamiento.estado }}">
+                {{ tratamiento.get_estado_display }}
+              </span>
+            </td>
+            <td>
+              <a href="{% url 'medicamentos:tratamiento_detail' tratamiento.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-clipboard2 display-4"></i>
+      <p class="mt-2">No hay tratamientos asociados a este medicamento</p>
+      <a href="{% url 'medicamentos:tratamiento_create' %}" class="btn btn-primary mt-2">
+        <i class="bi bi-plus-lg me-1"></i> Crear Tratamiento
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="mt-4">
+  <a href="{% url 'medicamentos:medicamentos_list' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Volver a medicamentos
+  </a>
+</div>
+{% endblock %}

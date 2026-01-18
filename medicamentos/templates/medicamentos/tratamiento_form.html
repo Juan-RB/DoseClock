@@ -1,0 +1,177 @@
+﻿{% extends 'medicamentos/base.html' %}
+
+{% block title %}{{ title }} - DoseClock{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h1 class="h4 mb-0">
+          <i class="bi bi-clipboard2-pulse me-2" aria-hidden="true"></i>
+          {{ title }}
+        </h1>
+      </div>
+      
+      <div class="card-body">
+        <form method="post" novalidate id="treatment-form">
+          {% csrf_token %}
+          
+          <!-- Medicamento -->
+          <div class="mb-3">
+            <label for="id_medicamento" class="form-label">
+              Medicamento <span class="text-danger">*</span>
+            </label>
+            {{ form.medicamento }}
+            {% if form.medicamento.errors %}
+            <div class="invalid-feedback d-block">{{ form.medicamento.errors.0 }}</div>
+            {% endif %}
+            <div class="mt-2">
+              <a href="{% url 'medicamentos:medicamento_create' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-plus me-1" aria-hidden="true"></i>
+                Crear nuevo medicamento
+              </a>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <!-- Primera toma -->
+          <div class="card bg-light mb-4">
+            <div class="card-body">
+              <h3 class="h6 mb-3">
+                <i class="bi bi-clock me-2" aria-hidden="true"></i>
+                Configuració³n de primera toma
+              </h3>
+              
+              <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="primera_toma_ahora" 
+                       name="primera_toma_ahora" checked>
+                <label class="form-check-label" for="primera_toma_ahora">
+                  La primera toma es ahora
+                </label>
+              </div>
+              
+              <div id="hora_ultima_container" class="mb-3" style="display: none;">
+                <label for="hora_ultima_toma" class="form-label">
+                  Hora de la óºltima toma
+                </label>
+                <input type="datetime-local" class="form-control" id="hora_ultima_toma" 
+                       name="hora_ultima_toma" aria-label="Hora de óºltima toma">
+                <small class="text-muted">Indica cuó¡ndo fue la óºltima vez que tomaste este medicamento</small>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Frecuencia -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="frecuencia_preset" class="form-label">
+                Frecuencia <span class="text-danger">*</span>
+              </label>
+              {{ form.frecuencia_preset }}
+            </div>
+            <div class="col-md-6">
+              <label for="id_frecuencia_horas" class="form-label">
+                Intervalo personalizado (horas)
+              </label>
+              {{ form.frecuencia_horas }}
+              {% if form.frecuencia_horas.errors %}
+              <div class="invalid-feedback d-block">{{ form.frecuencia_horas.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Duració³n -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="id_duracion_dias" class="form-label">
+                Duració³n (dó­as)
+              </label>
+              {{ form.duracion_dias }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check">
+                {{ form.es_indefinido }}
+                <label class="form-check-label" for="id_es_indefinido">
+                  Tratamiento indefinido
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Modo de có¡lculo -->
+          <div class="mb-3">
+            <label for="id_modo_calculo" class="form-label">
+              Modo de có¡lculo de pró³ximas tomas
+            </label>
+            {{ form.modo_calculo }}
+            <small class="text-muted d-block mt-1">
+              <strong>Desde hora programada:</strong> La siguiente toma se calcula desde la hora originalmente programada.<br>
+              <strong>Desde hora de confirmació³n:</strong> La siguiente toma se calcula desde cuando confirmaste la toma.
+            </small>
+          </div>
+          
+          <!-- Notas -->
+          <div class="mb-4">
+            <label for="id_notas" class="form-label">
+              Notas
+            </label>
+            {{ form.notas }}
+          </div>
+          
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'medicamentos:dashboard' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
+              Guardar Tratamiento
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const primeraToma = document.getElementById('primera_toma_ahora');
+    const horaContainer = document.getElementById('hora_ultima_container');
+    const frecuenciaPreset = document.getElementById('id_frecuencia_preset') || 
+                             document.querySelector('[name="frecuencia_preset"]');
+    const frecuenciaHoras = document.getElementById('id_frecuencia_horas');
+    const esIndefinido = document.getElementById('id_es_indefinido');
+    const duracionDias = document.getElementById('id_duracion_dias');
+    
+    // Toggle hora óºltima toma
+    primeraToma?.addEventListener('change', function() {
+      horaContainer.style.display = this.checked ? 'none' : 'block';
+    });
+    
+    // Handle frequency preset
+    frecuenciaPreset?.addEventListener('change', function() {
+      if (this.value && this.value !== 'custom') {
+        frecuenciaHoras.value = this.value;
+        frecuenciaHoras.readOnly = true;
+      } else {
+        frecuenciaHoras.readOnly = false;
+        frecuenciaHoras.focus();
+      }
+    });
+    
+    // Toggle duration field based on indefinido checkbox
+    esIndefinido?.addEventListener('change', function() {
+      duracionDias.disabled = this.checked;
+      if (this.checked) {
+        duracionDias.value = '';
+      }
+    });
+  });
+</script>
+{% endblock %}

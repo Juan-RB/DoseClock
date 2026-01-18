@@ -1,0 +1,340 @@
+/* ==========================================
+   DoseClock - Main Styles
+   ========================================== */
+
+:root {
+  /* Base Colors */
+  --dc-primary: #667eea;
+  --dc-secondary: #764ba2;
+  --dc-success: #28a745;
+  --dc-warning: #fd7e14;
+  --dc-danger: #dc3545;
+  --dc-info: #17a2b8;
+  
+  /* Status Colors */
+  --dc-status-confirmed: #28a745;
+  --dc-status-late: #fd7e14;
+  --dc-status-missed: #dc3545;
+  --dc-status-pending: #6c757d;
+  
+  /* Spacing */
+  --dc-spacing-xs: 0.25rem;
+  --dc-spacing-sm: 0.5rem;
+  --dc-spacing-md: 1rem;
+  --dc-spacing-lg: 1.5rem;
+  --dc-spacing-xl: 2rem;
+  
+  /* Border Radius */
+  --dc-radius-sm: 0.375rem;
+  --dc-radius-md: 0.5rem;
+  --dc-radius-lg: 1rem;
+  --dc-radius-pill: 50rem;
+  
+  /* Shadows */
+  --dc-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --dc-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --dc-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  
+  /* Transitions */
+  --dc-transition-fast: 0.15s ease;
+  --dc-transition-normal: 0.3s ease;
+}
+
+/* ==========================================
+   Base Styles
+   ========================================== */
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+main {
+  flex: 1;
+}
+
+/* ==========================================
+   Typography
+   ========================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+}
+
+/* ==========================================
+   Navbar
+   ========================================== */
+
+.navbar-custom {
+  background: linear-gradient(135deg, var(--dc-primary), var(--dc-secondary));
+  box-shadow: var(--dc-shadow-md);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  transition: color var(--dc-transition-fast);
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+  color: #fff !important;
+}
+
+.navbar-custom .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ==========================================
+   Cards
+   ========================================== */
+
+.card {
+  border: none;
+  border-radius: var(--dc-radius-lg);
+  transition: transform var(--dc-transition-normal), box-shadow var(--dc-transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--dc-shadow-md);
+}
+
+.medication-card .card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--dc-radius-lg) var(--dc-radius-lg) 0 0 !important;
+}
+
+.medication-card .card-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 var(--dc-radius-lg) var(--dc-radius-lg) !important;
+}
+
+/* ==========================================
+   Countdown Display
+   ========================================== */
+
+.countdown-container {
+  padding: var(--dc-spacing-md);
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: var(--dc-radius-md);
+}
+
+.countdown-display {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dc-primary);
+  letter-spacing: 0.05em;
+}
+
+/* Countdown States */
+.countdown-display.urgent {
+  color: var(--dc-danger);
+  animation: pulse 1s infinite;
+}
+
+.countdown-display.soon {
+  color: var(--dc-warning);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ==========================================
+   Status Badges
+   ========================================== */
+
+.badge.bg-activo,
+.bg-activo {
+  background-color: var(--dc-success) !important;
+}
+
+.badge.bg-pausado,
+.bg-pausado {
+  background-color: var(--dc-warning) !important;
+}
+
+.badge.bg-finalizado,
+.bg-finalizado {
+  background-color: var(--dc-secondary) !important;
+}
+
+/* ==========================================
+   Buttons
+   ========================================== */
+
+.btn {
+  border-radius: var(--dc-radius-md);
+  font-weight: 500;
+  transition: all var(--dc-transition-fast);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--dc-primary), var(--dc-secondary));
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd6, #6a4190);
+  transform: translateY(-1px);
+  box-shadow: var(--dc-shadow-sm);
+}
+
+.btn-confirm-dose {
+  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-confirm-dose:not(:disabled) {
+  animation: glow 2s infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(40, 167, 69, 0.8); }
+}
+
+/* ==========================================
+   Forms
+   ========================================== */
+
+.form-control,
+.form-select {
+  border-radius: var(--dc-radius-md);
+  border: 2px solid #e9ecef;
+  transition: border-color var(--dc-transition-fast), box-shadow var(--dc-transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--dc-primary);
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--dc-primary);
+  border-color: var(--dc-primary);
+}
+
+/* Color Input */
+.form-control-color {
+  width: 60px;
+  height: 40px;
+  padding: 0.25rem;
+}
+
+/* ==========================================
+   Progress Bar
+   ========================================== */
+
+.progress {
+  border-radius: var(--dc-radius-pill);
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  border-radius: var(--dc-radius-pill);
+}
+
+/* ==========================================
+   Tables
+   ========================================== */
+
+.table {
+  border-radius: var(--dc-radius-md);
+  overflow: hidden;
+}
+
+.table thead {
+  background-color: #f8f9fa;
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+
+.footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+/* ==========================================
+   Empty States
+   ========================================== */
+
+.empty-state {
+  padding: var(--dc-spacing-xl);
+}
+
+.empty-state i {
+  opacity: 0.5;
+}
+
+/* ==========================================
+   Color Dots
+   ========================================== */
+
+.color-dot {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   Skip Link (Accessibility)
+   ========================================== */
+
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--dc-primary);
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top var(--dc-transition-fast);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ==========================================
+   Responsive Adjustments
+   ========================================== */
+
+@media (max-width: 768px) {
+  .countdown-display {
+    font-size: 1.5rem;
+  }
+  
+  .btn-confirm-dose {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* ==========================================
+   Print Styles
+   ========================================== */
+
+@media print {
+  .navbar,
+  .btn,
+  .footer {
+    display: none !important;
+  }
+  
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #dee2e6 !important;
+  }
+}

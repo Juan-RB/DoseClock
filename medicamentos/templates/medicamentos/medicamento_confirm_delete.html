@@ -1,0 +1,72 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}Eliminar Medicamento - DoseClock{% endblock %}
+
+{% block content %}
+<div class="container-narrow mx-auto" style="max-width: 600px;">
+  <div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+      <h1 class="h4 mb-0">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Eliminar Medicamento
+      </h1>
+    </div>
+    
+    <div class="card-body">
+      <div class="alert alert-warning">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Importante:</strong> El historial de tomas se mantendra para consultas futuras.
+      </div>
+      
+      <p class="lead">
+        Estas seguro de que deseas eliminar el medicamento:
+      </p>
+      
+      <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+        <div class="me-3">
+          <span class="badge rounded-pill p-3" style="background-color: {{ medicamento.color|default:'#667eea' }};">
+            <i class="bi bi-capsule fs-4"></i>
+          </span>
+        </div>
+        <div>
+          <h2 class="h5 mb-1">{{ medicamento.nombre }}</h2>
+          {% if medicamento.notas %}
+          <small class="text-muted">{{ medicamento.notas|truncatewords:10 }}</small>
+          {% endif %}
+        </div>
+      </div>
+      
+      {% if tratamientos_activos > 0 %}
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-octagon me-2"></i>
+        <strong>Atencion:</strong> Este medicamento tiene 
+        <strong>{{ tratamientos_activos }}</strong> tratamiento{{ tratamientos_activos|pluralize:"s" }} activo{{ tratamientos_activos|pluralize:"s" }}.
+        Al eliminarlo, los tratamientos quedaran sin medicamento asociado.
+      </div>
+      {% endif %}
+      
+      <div class="mb-4">
+        <h3 class="h6 text-muted mb-2">Resumen:</h3>
+        <ul class="list-unstyled">
+          <li><i class="bi bi-clipboard2-pulse me-2 text-primary"></i>Tratamientos asociados: <strong>{{ medicamento.tratamientos.count }}</strong></li>
+          <li><i class="bi bi-clock-history me-2 text-success"></i>Tomas registradas: <strong>{{ total_tomas }}</strong></li>
+        </ul>
+      </div>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'medicamentos:medicamento_detail' medicamento.pk %}" class="btn btn-secondary">
+            <i class="bi bi-x-lg me-1"></i>
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>
+            Si, Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

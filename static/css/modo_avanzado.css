@@ -1,0 +1,314 @@
+/* ==========================================
+   DoseClock - Modo Visual Avanzado
+   Con pastillero animado
+   ========================================== */
+
+/* ==========================================
+   Advanced Mode Variables
+   ========================================== */
+
+:root {
+  --dc-pill-bg: linear-gradient(145deg, #ffffff, #e6e6e6);
+  --dc-pill-shadow: 5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff;
+  --dc-pill-shadow-inset: inset 3px 3px 6px #d9d9d9, inset -3px -3px 6px #ffffff;
+}
+
+/* ==========================================
+   Pill Box Container
+   ========================================== */
+
+.modo-avanzado .pillbox-container {
+  perspective: 1000px;
+  margin: 2rem auto;
+}
+
+.modo-avanzado .pillbox {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, #f0f0f0, #cacaca);
+  border-radius: 1.5rem;
+  box-shadow: var(--dc-pill-shadow);
+}
+
+/* ==========================================
+   Individual Pill Compartment
+   ========================================== */
+
+.modo-avanzado .pill-compartment {
+  aspect-ratio: 1;
+  background: var(--dc-pill-bg);
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  box-shadow: var(--dc-pill-shadow);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.modo-avanzado .pill-compartment:hover {
+  transform: translateY(-3px);
+  box-shadow: 8px 8px 15px #d9d9d9, -8px -8px 15px #ffffff;
+}
+
+.modo-avanzado .pill-compartment.taken {
+  box-shadow: var(--dc-pill-shadow-inset);
+}
+
+/* ==========================================
+   3D Pill Animation
+   ========================================== */
+
+.modo-avanzado .pill-3d {
+  width: 40px;
+  height: 20px;
+  border-radius: 50px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: float 3s ease-in-out infinite;
+}
+
+.modo-avanzado .pill-3d::before,
+.modo-avanzado .pill-3d::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  border-radius: 50px 0 0 50px;
+}
+
+.modo-avanzado .pill-3d::before {
+  left: 0;
+  background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%);
+}
+
+.modo-avanzado .pill-3d::after {
+  right: 0;
+  border-radius: 0 50px 50px 0;
+  background: linear-gradient(to bottom, #a8edea 0%, #fed6e3 100%);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotateX(0);
+  }
+  50% {
+    transform: translateY(-5px) rotateX(10deg);
+  }
+}
+
+/* ==========================================
+   Pill Colors by Medication
+   ========================================== */
+
+.modo-avanzado .pill-color-1::before { background: linear-gradient(to bottom, #667eea, #764ba2); }
+.modo-avanzado .pill-color-1::after { background: linear-gradient(to bottom, #f093fb, #f5576c); }
+
+.modo-avanzado .pill-color-2::before { background: linear-gradient(to bottom, #4facfe, #00f2fe); }
+.modo-avanzado .pill-color-2::after { background: linear-gradient(to bottom, #43e97b, #38f9d7); }
+
+.modo-avanzado .pill-color-3::before { background: linear-gradient(to bottom, #fa709a, #fee140); }
+.modo-avanzado .pill-color-3::after { background: linear-gradient(to bottom, #30cfd0, #330867); }
+
+/* ==========================================
+   Medication Card - Advanced Style
+   ========================================== */
+
+.modo-avanzado .medication-card {
+  background: linear-gradient(145deg, #ffffff, #e8e8e8);
+  box-shadow: 10px 10px 20px #d4d4d4, -10px -10px 20px #ffffff;
+  border: none;
+  overflow: visible;
+}
+
+.modo-avanzado .medication-card:hover {
+  transform: translateY(-5px) rotateX(2deg);
+  box-shadow: 15px 15px 30px #d4d4d4, -15px -15px 30px #ffffff;
+}
+
+.modo-avanzado .medication-card .card-header {
+  background: transparent;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* ==========================================
+   Countdown - Advanced Style
+   ========================================== */
+
+.modo-avanzado .countdown-container {
+  background: linear-gradient(145deg, #e6e6e6, #ffffff);
+  box-shadow: inset 5px 5px 10px #d9d9d9, inset -5px -5px 10px #ffffff;
+  border-radius: 1rem;
+}
+
+.modo-avanzado .countdown-display {
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--dc-primary), var(--dc-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================
+   Confirm Button - Advanced Style
+   ========================================== */
+
+.modo-avanzado .btn-confirm-dose {
+  background: linear-gradient(145deg, #2ed573, #26ab5f);
+  box-shadow: 5px 5px 10px #1e8449, -5px -5px 10px #36d87d;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.modo-avanzado .btn-confirm-dose:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 8px 8px 15px #1e8449, -8px -8px 15px #36d87d;
+}
+
+.modo-avanzado .btn-confirm-dose:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 3px 3px 6px #1e8449, inset -3px -3px 6px #36d87d;
+}
+
+/* ==========================================
+   Progress Bar - Advanced Style
+   ========================================== */
+
+.modo-avanzado .progress {
+  background: linear-gradient(145deg, #e6e6e6, #ffffff);
+  box-shadow: inset 3px 3px 6px #d9d9d9, inset -3px -3px 6px #ffffff;
+  height: 12px;
+}
+
+.modo-avanzado .progress-bar {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 50rem;
+}
+
+/* ==========================================
+   Daily Schedule View
+   ========================================== */
+
+.modo-avanzado .daily-schedule {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.modo-avanzado .hour-slot {
+  min-width: 80px;
+  padding: 1rem;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border-radius: 1rem;
+  box-shadow: var(--dc-pill-shadow);
+  text-align: center;
+}
+
+.modo-avanzado .hour-slot.has-dose {
+  border: 2px solid var(--dc-primary);
+}
+
+.modo-avanzado .hour-slot .time {
+  font-weight: bold;
+  color: var(--dc-text-primary);
+}
+
+.modo-avanzado .hour-slot .pill-mini {
+  width: 30px;
+  height: 15px;
+  margin: 0.5rem auto;
+  border-radius: 50px;
+}
+
+/* ==========================================
+   Animations
+   ========================================== */
+
+.modo-avanzado .pill-taken-animation {
+  animation: pill-drop 0.5s ease-out forwards;
+}
+
+@keyframes pill-drop {
+  0% {
+    transform: translateY(0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50px) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.modo-avanzado .pill-appear-animation {
+  animation: pill-appear 0.5s ease-out forwards;
+}
+
+@keyframes pill-appear {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+/* ==========================================
+   Navbar - Advanced Style
+   ========================================== */
+
+.modo-avanzado .navbar-custom {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* ==========================================
+   Status Indicators - Advanced
+   ========================================== */
+
+.modo-avanzado .status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.modo-avanzado .status-indicator.confirmed::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--dc-status-confirmed);
+  animation: ring-pulse 1.5s infinite;
+}
+
+@keyframes ring-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ==========================================
+   Responsive Adjustments
+   ========================================== */
+
+@media (max-width: 768px) {
+  .modo-avanzado .pillbox {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .modo-avanzado .countdown-display {
+    font-size: 2rem;
+  }
+  
+  .modo-avanzado .pill-3d {
+    width: 30px;
+    height: 15px;
+  }
+}

@@ -1,0 +1,209 @@
+﻿/* ==========================================
+   DoseClock - Modo Minimalista
+   Diseó±o limpio con paletas nude
+   ========================================== */
+
+/* ==========================================
+   Paleta Nude (default)
+   ========================================== */
+
+.paleta-nude {
+  --dc-bg-primary: #faf8f5;
+  --dc-bg-secondary: #f5f0eb;
+  --dc-bg-card: #ffffff;
+  --dc-text-primary: #4a4a4a;
+  --dc-text-secondary: #7a7a7a;
+  --dc-accent: #c9b8a8;
+  --dc-accent-hover: #b8a797;
+  --dc-border: #e8e2dc;
+}
+
+/* ==========================================
+   Paleta Azul Sereno
+   ========================================== */
+
+.paleta-azul {
+  --dc-bg-primary: #f5f8fc;
+  --dc-bg-secondary: #eaf1f9;
+  --dc-bg-card: #ffffff;
+  --dc-text-primary: #2c3e50;
+  --dc-text-secondary: #5d7186;
+  --dc-accent: #7eb8da;
+  --dc-accent-hover: #6aa8cc;
+  --dc-border: #d4e4f2;
+}
+
+/* ==========================================
+   Paleta Verde Natural
+   ========================================== */
+
+.paleta-verde {
+  --dc-bg-primary: #f5faf5;
+  --dc-bg-secondary: #e8f5e8;
+  --dc-bg-card: #ffffff;
+  --dc-text-primary: #2d4a2d;
+  --dc-text-secondary: #5a7a5a;
+  --dc-accent: #8fbc8f;
+  --dc-accent-hover: #7aab7a;
+  --dc-border: #c8e6c8;
+}
+
+/* ==========================================
+   Paleta Póºrpura Suave
+   ========================================== */
+
+.paleta-purpura {
+  --dc-bg-primary: #faf5fc;
+  --dc-bg-secondary: #f2e8f7;
+  --dc-bg-card: #ffffff;
+  --dc-text-primary: #4a2d5a;
+  --dc-text-secondary: #7a5a8a;
+  --dc-accent: #b8a0c8;
+  --dc-accent-hover: #a890b8;
+  --dc-border: #e2d4ec;
+}
+
+/* ==========================================
+   Apply Palette to Elements
+   ========================================== */
+
+[class*="paleta-"] {
+  background-color: var(--dc-bg-primary);
+  color: var(--dc-text-primary);
+}
+
+[class*="paleta-"] .card {
+  background-color: var(--dc-bg-card);
+  border: 1px solid var(--dc-border);
+}
+
+[class*="paleta-"] .card-header {
+  background-color: var(--dc-bg-secondary);
+  border-bottom-color: var(--dc-border);
+}
+
+[class*="paleta-"] .text-muted {
+  color: var(--dc-text-secondary) !important;
+}
+
+[class*="paleta-"] .navbar-custom {
+  background: var(--dc-accent) !important;
+}
+
+[class*="paleta-"] .btn-primary {
+  background: var(--dc-accent);
+  border-color: var(--dc-accent);
+}
+
+[class*="paleta-"] .btn-primary:hover {
+  background: var(--dc-accent-hover);
+  border-color: var(--dc-accent-hover);
+}
+
+[class*="paleta-"] .btn-outline-primary {
+  color: var(--dc-accent);
+  border-color: var(--dc-accent);
+}
+
+[class*="paleta-"] .btn-outline-primary:hover {
+  background-color: var(--dc-accent);
+  color: white;
+}
+
+[class*="paleta-"] .form-control:focus,
+[class*="paleta-"] .form-select:focus {
+  border-color: var(--dc-accent);
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+}
+
+[class*="paleta-"] .form-check-input:checked {
+  background-color: var(--dc-accent);
+  border-color: var(--dc-accent);
+}
+
+[class*="paleta-"] .table-light {
+  background-color: var(--dc-bg-secondary);
+}
+
+[class*="paleta-"] .footer {
+  background-color: var(--dc-bg-secondary);
+  border-top-color: var(--dc-border);
+}
+
+/* ==========================================
+   Minimalist Card Styles
+   ========================================== */
+
+.medication-card {
+  transition: all 0.3s ease;
+}
+
+.medication-card:hover {
+  transform: translateY(-4px);
+}
+
+.medication-card .countdown-container {
+  background: var(--dc-bg-secondary);
+  border: none;
+}
+
+.medication-card .countdown-display {
+  color: var(--dc-text-primary);
+}
+
+/* ==========================================
+   Minimalist Form Elements
+   ========================================== */
+
+[class*="paleta-"] .form-control,
+[class*="paleta-"] .form-select {
+  background-color: var(--dc-bg-card);
+  border-color: var(--dc-border);
+  color: var(--dc-text-primary);
+}
+
+[class*="paleta-"] .form-control::placeholder {
+  color: var(--dc-text-secondary);
+}
+
+/* ==========================================
+   Minimalist Progress Bar
+   ========================================== */
+
+[class*="paleta-"] .progress {
+  background-color: var(--dc-bg-secondary);
+}
+
+/* ==========================================
+   Soft Shadows for Minimalist Mode
+   ========================================== */
+
+[class*="paleta-"] .card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[class*="paleta-"] .card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================
+   Alert Styles
+   ========================================== */
+
+[class*="paleta-"] .alert {
+  border: none;
+  border-radius: 0.75rem;
+}
+
+/* ==========================================
+   Minimalist Button Glow Override
+   ========================================== */
+
+[class*="paleta-"] .btn-confirm-dose:not(:disabled) {
+  animation: soft-glow 2s infinite;
+}
+
+@keyframes soft-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(40, 167, 69, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(40, 167, 69, 0.5); }
+}

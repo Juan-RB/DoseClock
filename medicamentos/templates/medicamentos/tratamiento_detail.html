@@ -1,0 +1,207 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}{{ tratamiento.nombre_medicamento }} - DoseClock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1">
+        <li class="breadcrumb-item"><a href="{% url 'medicamentos:dashboard' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'medicamentos:tratamientos_list' %}">Tratamientos</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+      </ol>
+    </nav>
+    <h1 class="h2 mb-0">
+      <i class="bi bi-clipboard2-pulse me-2 text-primary"></i>
+      {{ tratamiento.nombre_medicamento }}
+    </h1>
+  </div>
+  <span class="badge bg-{{ tratamiento.estado }} fs-6">
+    {{ tratamiento.get_estado_display }}
+  </span>
+</div>
+
+<!-- Treatment Info Card -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0">Informacion del Tratamiento</h2>
+    <div class="btn-group">
+      <a href="{% url 'medicamentos:tratamiento_edit' tratamiento.pk %}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-pencil me-1"></i> Editar
+      </a>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Frecuencia</h3>
+        <p class="mb-0 fs-5">
+          <i class="bi bi-arrow-repeat me-2 text-primary"></i>
+          Cada {{ tratamiento.frecuencia_horas }} horas
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Duracion</h3>
+        <p class="mb-0 fs-5">
+          {% if tratamiento.es_indefinido %}
+            <i class="bi bi-infinity me-2 text-info"></i> Indefinido
+          {% else %}
+            <i class="bi bi-calendar-range me-2 text-success"></i> {{ tratamiento.duracion_dias }} dias
+          {% endif %}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Inicio</h3>
+        <p class="mb-0">
+          <i class="bi bi-calendar-event me-2 text-primary"></i>
+          {{ tratamiento.fecha_hora_inicio|date:"d/m/Y H:i" }}
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h3 class="h6 text-muted">Modo de calculo</h3>
+        <p class="mb-0">
+          <i class="bi bi-calculator me-2 text-secondary"></i>
+          {{ tratamiento.get_modo_calculo_display }}
+        </p>
+      </div>
+      {% if tratamiento.notas %}
+      <div class="col-12">
+        <h3 class="h6 text-muted">Notas</h3>
+        <p class="mb-0">{{ tratamiento.notas }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Adherence Stats -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header">
+    <h2 class="h5 mb-0">
+      <i class="bi bi-graph-up me-2"></i>
+      Estadisticas de Adherencia
+    </h2>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div class="text-center p-3 bg-light rounded">
+          <div class="h2 mb-0 text-primary">{{ status_summary.total }}</div>
+          <small class="text-muted">Total tomas</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-center p-3 bg-light rounded">
+          <div class="h2 mb-0 text-success">{{ status_summary.confirmed_on_time }}</div>
+          <small class="text-muted">A tiempo</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-center p-3 bg-light rounded">
+          <div class="h2 mb-0 text-warning">{{ status_summary.confirmed_late }}</div>
+          <small class="text-muted">Tardias</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-center p-3 bg-light rounded">
+          <div class="h2 mb-0 text-danger">{{ status_summary.missed }}</div>
+          <small class="text-muted">No tomadas</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-4">
+      <div class="d-flex justify-content-between mb-1">
+        <span>Tasa de adherencia</span>
+        <span class="fw-bold">{{ status_summary.adherence_rate }}%</span>
+      </div>
+      <div class="progress" style="height: 12px;">
+        <div class="progress-bar bg-success" style="width: {{ status_summary.adherence_rate }}%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Doses -->
+<div class="card shadow-sm mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h2 class="h5 mb-0">
+      <i class="bi bi-clock-history me-2"></i>
+      Tomas Recientes
+    </h2>
+    <a href="{% url 'medicamentos:historial_tratamiento' tratamiento.pk %}" class="btn btn-sm btn-outline-secondary">
+      Ver todo el historial
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if recent_doses %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha/Hora</th>
+            <th>Estado</th>
+            <th>Confirmada</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for toma in recent_doses|slice:":10" %}
+          <tr>
+            <td>{{ toma.hora_programada|date:"d/m/Y H:i" }}</td>
+            <td>
+              <span class="badge" style="background-color: {{ toma.color_estado }};">
+                {{ toma.get_estado_display }}
+              </span>
+            </td>
+            <td>
+              {% if toma.hora_confirmada %}
+                {{ toma.hora_confirmada|date:"H:i" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted">
+      <i class="bi bi-inbox display-4"></i>
+      <p class="mt-2">No hay tomas registradas</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="card shadow-sm">
+  <div class="card-header">
+    <h2 class="h5 mb-0">
+      <i class="bi bi-gear me-2"></i>
+      Acciones
+    </h2>
+  </div>
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-2">
+      {% if tratamiento.estado == 'activo' %}
+      <a href="{% url 'medicamentos:tratamiento_toggle_pause' tratamiento.pk %}" class="btn btn-warning">
+        <i class="bi bi-pause-circle me-1"></i> Pausar
+      </a>
+      <a href="{% url 'medicamentos:tratamiento_finalizar' tratamiento.pk %}" class="btn btn-secondary">
+        <i class="bi bi-stop-circle me-1"></i> Finalizar
+      </a>
+      {% elif tratamiento.estado == 'pausado' %}
+      <a href="{% url 'medicamentos:tratamiento_toggle_pause' tratamiento.pk %}" class="btn btn-success">
+        <i class="bi bi-play-circle me-1"></i> Reanudar
+      </a>
+      {% endif %}
+      
+      <a href="{% url 'medicamentos:tratamiento_delete' tratamiento.pk %}" class="btn btn-outline-danger ms-auto">
+        <i class="bi bi-trash me-1"></i> Eliminar tratamiento
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

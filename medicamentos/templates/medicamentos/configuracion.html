@@ -1,0 +1,176 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}Configuracion - DoseClock{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h1 class="h2 mb-4">
+      <i class="bi bi-gear me-2 text-primary" aria-hidden="true"></i>
+      Configuracion
+    </h1>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Visual Settings -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">
+            <i class="bi bi-palette me-2" aria-hidden="true"></i>
+            Apariencia
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_modo_visual" class="form-label">Modo visual</label>
+              {{ form.modo_visual }}
+            </div>
+            <div class="col-md-6">
+              <label for="id_paleta_colores" class="form-label">Paleta de colores</label>
+              {{ form.paleta_colores }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accessibility -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">
+            <i class="bi bi-universal-access me-2" aria-hidden="true"></i>
+            Accesibilidad
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_tamano_texto" class="form-label">Tamano de texto</label>
+              {{ form.tamano_texto }}
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check">
+                {{ form.alto_contraste }}
+                <label class="form-check-label" for="id_alto_contraste">
+                  Modo alto contraste
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">
+            <i class="bi bi-bell me-2" aria-hidden="true"></i>
+            Notificaciones
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="form-check mb-3">
+            {{ form.notificaciones_activas }}
+            <label class="form-check-label" for="id_notificaciones_activas">
+              Notificaciones activas
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            {{ form.recordatorio_anticipado }}
+            <label class="form-check-label" for="id_recordatorio_anticipado">
+              Recordatorio 5 minutos antes de cada toma
+            </label>
+          </div>
+          <div class="form-check">
+            {{ form.sonido_notificacion }}
+            <label class="form-check-label" for="id_sonido_notificacion">
+              Sonido en notificaciones
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telegram Integration -->
+      <div class="card mb-4">
+        <div class="card-header bg-info bg-opacity-10">
+          <h2 class="h5 mb-0">
+            <i class="bi bi-telegram me-2 text-info"></i>
+            Telegram
+          </h2>
+        </div>
+        <div class="card-body">
+          {% if config.telegram_chat_id and config.telegram_activo %}
+          <div class="alert alert-success mb-3">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>Telegram vinculado!</strong>
+            <br>
+            <small class="text-muted">
+              Chat ID: {{ config.telegram_chat_id }}
+              {% if config.telegram_vinculado %}
+              | Vinculado: {{ config.telegram_vinculado|date:"d/m/Y H:i" }}
+              {% endif %}
+            </small>
+          </div>
+          
+          <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'medicamentos:telegram_test' %}" class="btn btn-outline-success">
+              <i class="bi bi-send me-1"></i> Enviar prueba
+            </a>
+            <form method="post" action="{% url 'medicamentos:telegram_desvincular' %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Desvincular Telegram?')">
+                <i class="bi bi-x-circle me-1"></i> Desvincular
+              </button>
+            </form>
+          </div>
+          {% else %}
+          <p class="text-muted mb-3">
+            Recibe recordatorios de tus medicamentos directamente en Telegram.
+          </p>
+          <a href="{% url 'medicamentos:telegram_vincular' %}" class="btn btn-info">
+            <i class="bi bi-telegram me-1"></i> Vincular Telegram
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Backup -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">
+            <i class="bi bi-cloud-arrow-down me-2" aria-hidden="true"></i>
+            Copias de seguridad
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="form-check mb-3">
+            {{ form.backup_automatico }}
+            <label class="form-check-label" for="id_backup_automatico">
+              Backup automatico
+            </label>
+          </div>
+          <div class="mb-3">
+            <label for="id_frecuencia_backup_dias" class="form-label">
+              Frecuencia de backup (dias)
+            </label>
+            {{ form.frecuencia_backup_dias }}
+          </div>
+          <a href="{% url 'medicamentos:backup_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-folder me-1" aria-hidden="true"></i>
+            Gestionar backups
+          </a>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
+          Guardar Configuracion
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

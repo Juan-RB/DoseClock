@@ -1,0 +1,87 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}Eliminar Tratamiento - DoseClock{% endblock %}
+
+{% block content %}
+<div class="container-narrow mx-auto" style="max-width: 600px;">
+  <div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+      <h1 class="h4 mb-0">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Eliminar Tratamiento
+      </h1>
+    </div>
+    
+    <div class="card-body">
+      <div class="alert alert-warning">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Importante:</strong> El historial de tomas se mantendra para consultas futuras.
+      </div>
+      
+      <p class="lead">
+        Estas seguro de que deseas eliminar este tratamiento?
+      </p>
+      
+      <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+        <div class="me-3">
+          {% if tratamiento.medicamento %}
+          <span class="badge rounded-pill p-3" style="background-color: {{ tratamiento.medicamento.color|default:'#667eea' }};">
+            <i class="bi bi-capsule fs-4"></i>
+          </span>
+          {% else %}
+          <span class="badge rounded-pill p-3 bg-secondary">
+            <i class="bi bi-capsule fs-4"></i>
+          </span>
+          {% endif %}
+        </div>
+        <div>
+          <h2 class="h5 mb-1">{{ tratamiento.nombre_medicamento }}</h2>
+          <small class="text-muted">
+            Cada {{ tratamiento.frecuencia_horas }}h | 
+            {% if tratamiento.es_indefinido %}Indefinido{% else %}{{ tratamiento.duracion_dias }} dias{% endif %}
+          </small>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="h6 text-muted mb-2">Estadisticas del tratamiento:</h3>
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="p-3 bg-light rounded text-center">
+              <div class="h3 mb-0 text-primary">{{ total_tomas }}</div>
+              <small class="text-muted">Tomas totales</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-3 bg-light rounded text-center">
+              <div class="h3 mb-0 text-success">{{ tomas_confirmadas }}</div>
+              <small class="text-muted">Confirmadas</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="alert alert-info">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Tip:</strong> Si solo quieres detener el tratamiento temporalmente, 
+        considera <a href="{% url 'medicamentos:tratamiento_toggle_pause' tratamiento.pk %}" class="alert-link">pausarlo</a> 
+        o <a href="{% url 'medicamentos:tratamiento_finalizar' tratamiento.pk %}" class="alert-link">finalizarlo</a> en su lugar.
+      </div>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'medicamentos:tratamiento_detail' tratamiento.pk %}" class="btn btn-secondary">
+            <i class="bi bi-x-lg me-1"></i>
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>
+            Si, Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+﻿{% extends 'medicamentos/base.html' %}
+
+{% block title %}Historial de Tomas - DoseClock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h2">
+    <i class="bi bi-clock-history me-2 text-primary" aria-hidden="true"></i>
+    Historial de Tomas
+  </h1>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label for="medicamento" class="form-label">Medicamento</label>
+        <select name="medicamento" id="medicamento" class="form-select">
+          <option value="">Todos</option>
+          {% for med in medicamentos %}
+          <option value="{{ med.id }}" {% if medicamento_filter == med.id|stringformat:"s" %}selected{% endif %}>
+            {{ med.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="estado" class="form-label">Estado</label>
+        <select name="estado" id="estado" class="form-select">
+          <option value="">Todos</option>
+          <option value="confirmada" {% if estado_filter == 'confirmada' %}selected{% endif %}>Confirmada a tiempo</option>
+          <option value="tarde" {% if estado_filter == 'tarde' %}selected{% endif %}>Confirmada tarde</option>
+          <option value="no_tomada" {% if estado_filter == 'no_tomada' %}selected{% endif %}>No tomada</option>
+          <option value="pendiente" {% if estado_filter == 'pendiente' %}selected{% endif %}>Pendiente</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary me-2">
+          <i class="bi bi-filter me-1" aria-hidden="true"></i>
+          Filtrar
+        </button>
+        <a href="{% url 'medicamentos:historial_tomas' %}" class="btn btn-outline-secondary">
+          Limpiar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Results -->
+{% if tomas %}
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">Medicamento</th>
+        <th scope="col">Hora Programada</th>
+        <th scope="col">Hora Confirmada</th>
+        <th scope="col">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for toma in tomas %}
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <span class="color-dot me-2" 
+                  style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ toma.tratamiento.medicamento.color|default:'#667eea' }};">
+            </span>
+            {{ toma.tratamiento.medicamento.nombre }}
+          </div>
+        </td>
+        <td>{{ toma.hora_programada|date:"d/m/Y H:i" }}</td>
+        <td>
+          {% if toma.hora_confirmada %}
+            {{ toma.hora_confirmada|date:"d/m/Y H:i" }}
+          {% else %}
+            <span class="text-muted">-</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge" style="background-color: {{ toma.color_estado }};">
+            {% if toma.estado == 'confirmada' %}
+              <i class="bi bi-check-circle me-1" aria-hidden="true"></i>A tiempo
+            {% elif toma.estado == 'tarde' %}
+              <i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i>Tarde
+            {% elif toma.estado == 'no_tomada' %}
+              <i class="bi bi-x-circle me-1" aria-hidden="true"></i>No tomada
+            {% else %}
+              <i class="bi bi-hourglass me-1" aria-hidden="true"></i>Pendiente
+            {% endif %}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <i class="bi bi-clock-history display-1 text-muted mb-3" aria-hidden="true"></i>
+  <h2 class="h4 text-muted">No hay registros de tomas</h2>
+  <p class="text-muted">Los registros apareceró¡n aquó­ a medida que confirmes tus medicamentos.</p>
+</div>
+{% endif %}
+{% endblock %}

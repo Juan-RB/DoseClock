@@ -1,0 +1,103 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}Vincular Telegram - DoseClock{% endblock %}
+
+{% block content %}
+<div class="container-narrow mx-auto" style="max-width: 600px;">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'medicamentos:configuracion' %}">Configuracion</a></li>
+      <li class="breadcrumb-item active">Vincular Telegram</li>
+    </ol>
+  </nav>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h1 class="h4 mb-0">
+        <i class="bi bi-telegram me-2"></i>
+        Vincular Telegram
+      </h1>
+    </div>
+    
+    <div class="card-body">
+      {% if bot_info.valid %}
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i>
+        Bot conectado: <strong>@{{ bot_username }}</strong>
+      </div>
+      
+      <div class="mb-4">
+        <h2 class="h5">Pasos para vincular:</h2>
+        <ol class="list-group list-group-numbered">
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Abre Telegram</div>
+              Busca el bot: <a href="https://t.me/{{ bot_username }}" target="_blank" class="text-decoration-none">@{{ bot_username }}</a>
+            </div>
+            <span class="badge bg-primary rounded-pill">1</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Inicia el chat</div>
+              Presiona "Iniciar" o envia cualquier mensaje (ej: "hola")
+            </div>
+            <span class="badge bg-primary rounded-pill">2</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Presiona "Vincular"</div>
+              Haz clic en el boton de abajo para completar la vinculacion
+            </div>
+            <span class="badge bg-primary rounded-pill">3</span>
+          </li>
+        </ol>
+      </div>
+      
+      <div class="text-center mb-4">
+        <a href="https://t.me/{{ bot_username }}" target="_blank" class="btn btn-lg btn-outline-primary mb-3">
+          <i class="bi bi-telegram me-2"></i>
+          Abrir @{{ bot_username }} en Telegram
+        </a>
+      </div>
+      
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Importante:</strong> Debes enviar al menos un mensaje al bot antes de vincular.
+      </div>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-link-45deg me-2"></i>
+            Vincular mi cuenta
+          </button>
+          <a href="{% url 'medicamentos:configuracion' %}" class="btn btn-secondary">
+            Cancelar
+          </a>
+        </div>
+      </form>
+      
+      {% else %}
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Error:</strong> No se pudo conectar con el bot de Telegram.
+        <br>{{ bot_info.error }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="card mt-4">
+    <div class="card-body">
+      <h3 class="h6 text-muted">Que recibiras por Telegram?</h3>
+      <ul class="mb-0">
+        <li>Recordatorios de tus medicamentos</li>
+        <li>Alertas 5 minutos antes de cada toma</li>
+        <li>Botones para confirmar tomas directamente</li>
+        <li>Notificaciones de tomas no confirmadas</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
