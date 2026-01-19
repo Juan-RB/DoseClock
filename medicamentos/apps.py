@@ -4,4 +4,4 @@
 class MedicamentosConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'medicamentos'
-    verbose_name = 'Gestió³n de Medicamentos'
+    verbose_name = 'Gestion de Medicamentos'

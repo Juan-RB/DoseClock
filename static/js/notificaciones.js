@@ -141,7 +141,7 @@ function showDoseReminder(doseData) {
 function showAdvanceReminder(doseData) {
   const title = `Recordatorio: ${doseData.medicationName}`;
   const options = {
-    body: `Tu medicamento estó¡ programado en 5 minutos.`,
+    body: `Tu medicamento esta programado en 5 minutos.`,
     icon: '/static/icons/icon-192.png',
     tag: `reminder-${doseData.doseId}`,
     data: {

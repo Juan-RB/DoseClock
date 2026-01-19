@@ -102,7 +102,7 @@ def get_notification_data(notification):
         body = "Toca para confirmar la toma."
     else:
         title = f"Recordatorio: {medication.nombre}"
-        body = f"Tu medicamento estó¡ programado en 5 minutos."
+        body = f"Tu medicamento esta programado en 5 minutos."
     
     return {
         'title': title,

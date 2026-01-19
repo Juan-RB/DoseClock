@@ -421,7 +421,7 @@ def confirmar_toma(request, pk):
         if result['was_on_time']:
             messages.success(request, '¡Toma confirmada a tiempo!')
         else:
-            messages.warning(request, 'Toma confirmada (tardía).')
+            messages.warning(request, 'Toma confirmada (tardia).')
         
         return redirect('medicamentos:dashboard')
     
@@ -479,7 +479,7 @@ def calendario_datos(request):
     return JsonResponse(events, safe=False)
 
 
-# ==================== CONFIGURACIÓN ====================
+# ==================== CONFIGURACION ====================
 
 @login_required
 def configuracion(request):
@@ -491,7 +491,7 @@ def configuracion(request):
         form = ConfiguracionForm(request.POST, instance=config)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Configuración guardada.')
+            messages.success(request, 'Configuracion guardada.')
             return redirect('medicamentos:configuracion')
     else:
         form = ConfiguracionForm(instance=config)
@@ -704,7 +704,7 @@ def api_telegram_check_reminders(request):
     
     return JsonResponse({
         'success': True,
-        'message': f'Verificación completada',
+        'message': f'Verificacion completada',
         'timestamp': now.isoformat(),
         'reminders_sent': {
             'anticipados': enviados_anticipados,

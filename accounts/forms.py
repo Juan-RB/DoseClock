@@ -23,19 +23,19 @@ def validate_password_strength(password):
     errors = []
     
     if len(password) < 8:
-        errors.append("La contraseña debe tener al menos 8 caracteres.")
+        errors.append("La contrasena debe tener al menos 8 caracteres.")
     
     if not re.search(r'[A-Z]', password):
-        errors.append("Debe contener al menos una letra mayúscula.")
+        errors.append("Debe contener al menos una letra mayuscula.")
     
     if not re.search(r'[a-z]', password):
-        errors.append("Debe contener al menos una letra minúscula.")
+        errors.append("Debe contener al menos una letra minuscula.")
     
     if not re.search(r'\d', password):
-        errors.append("Debe contener al menos un número.")
+        errors.append("Debe contener al menos un numero.")
     
     if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;\'`~]', password):
-        errors.append("Debe contener al menos un carácter especial (!@#$%^&*...).")
+        errors.append("Debe contener al menos un caracter especial (!@#$%^&*...).")
     
     if errors:
         raise ValidationError(errors)
@@ -58,16 +58,16 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control form-control-lg',
-            'placeholder': 'Contraseña',
+            'placeholder': 'Contrasena',
             'autocomplete': 'current-password',
             'id': 'login-password'
         }),
-        label='Contraseña'
+        label='Contrasena'
     )
 
     error_messages = {
-        'invalid_login': 'Usuario o contraseña incorrectos. Por favor, intenta de nuevo.',
-        'inactive': 'Esta cuenta está desactivada.',
+        'invalid_login': 'Usuario o contrasena incorrectos. Por favor, intenta de nuevo.',
+        'inactive': 'Esta cuenta esta desactivada.',
     }
 
 
@@ -94,8 +94,8 @@ class RegistroForm(UserCreationForm):
             'placeholder': 'correo@ejemplo.com (opcional)',
             'id': 'registro-email'
         }),
-        label='Correo electrónico (opcional)',
-        help_text='Para recuperar tu cuenta si olvidas la contraseña'
+        label='Correo electronico (opcional)',
+        help_text='Para recuperar tu cuenta si olvidas la contrasena'
     )
     
     edad = forms.IntegerField(
@@ -109,7 +109,7 @@ class RegistroForm(UserCreationForm):
             'max': '120'
         }),
         label='Edad',
-        help_text='Requerido para validaciones médicas'
+        help_text='Requerido para validaciones medicas'
     )
     
     username = forms.CharField(
@@ -121,28 +121,28 @@ class RegistroForm(UserCreationForm):
             'id': 'registro-username'
         }),
         label='Nombre de usuario',
-        help_text='Único, sin espacios. Ej: juan_perez'
+        help_text='Unico, sin espacios. Ej: juan_perez'
     )
     
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control form-control-lg',
-            'placeholder': 'Contraseña',
+            'placeholder': 'Contrasena',
             'autocomplete': 'new-password',
             'id': 'registro-password1'
         }),
-        label='Contraseña',
-        help_text='Mínimo 8 caracteres, con mayúscula, número y símbolo'
+        label='Contrasena',
+        help_text='Minimo 8 caracteres, con mayuscula, numero y simbolo'
     )
     
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': 'form-control form-control-lg',
-            'placeholder': 'Confirmar contraseña',
+            'placeholder': 'Confirmar contrasena',
             'autocomplete': 'new-password',
             'id': 'registro-password2'
         }),
-        label='Confirmar contraseña'
+        label='Confirmar contrasena'
     )
 
     class Meta:
@@ -157,7 +157,7 @@ class RegistroForm(UserCreationForm):
             raise ValidationError('El nombre de usuario no puede contener espacios.')
         
         if User.objects.filter(username__iexact=username).exists():
-            raise ValidationError('Este nombre de usuario ya está en uso.')
+            raise ValidationError('Este nombre de usuario ya esta en uso.')
         
         return username.lower()
 
@@ -166,7 +166,7 @@ class RegistroForm(UserCreationForm):
         email = self.cleaned_data.get('email')
         
         if email and User.objects.filter(email__iexact=email).exists():
-            raise ValidationError('Este correo electrónico ya está registrado.')
+            raise ValidationError('Este correo electronico ya esta registrado.')
         
         return email.lower() if email else ''
 
@@ -180,13 +180,13 @@ class RegistroForm(UserCreationForm):
         
         # Check password is not too similar to username or name
         if username and username.lower() in password.lower():
-            raise ValidationError('La contraseña no puede contener tu nombre de usuario.')
+            raise ValidationError('La contrasena no puede contener tu nombre de usuario.')
         
         if nombre:
             nombre_parts = nombre.lower().split()
             for part in nombre_parts:
                 if len(part) > 3 and part in password.lower():
-                    raise ValidationError('La contraseña no puede contener partes de tu nombre.')
+                    raise ValidationError('La contrasena no puede contener partes de tu nombre.')
         
         return password
 
@@ -219,7 +219,7 @@ class PerfilForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'correo@ejemplo.com'
         }),
-        label='Correo electrónico'
+        label='Correo electronico'
     )
     
     class Meta:

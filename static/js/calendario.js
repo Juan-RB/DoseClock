@@ -32,7 +32,7 @@ function initializeCalendar(elementId, eventsUrl) {
       today: 'Hoy',
       month: 'Mes',
       week: 'Semana',
-      day: 'Dó­a',
+      day: 'Dia',
       list: 'Lista'
     },
     events: eventsUrl,

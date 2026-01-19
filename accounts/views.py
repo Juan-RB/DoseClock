@@ -32,7 +32,7 @@ def login_view(request):
             next_url = request.GET.get('next', 'medicamentos:dashboard')
             return redirect(next_url)
         else:
-            messages.error(request, 'Usuario o contraseña incorrectos.')
+            messages.error(request, 'Usuario o contrasena incorrectos.')
     else:
         form = LoginForm()
     
@@ -70,7 +70,7 @@ def logout_view(request):
     if request.user.is_authenticated:
         nombre = request.user.perfil.nombre_completo if hasattr(request.user, 'perfil') else request.user.username
         logout(request)
-        messages.info(request, f'Hasta pronto, {nombre}. ¡Tu sesión ha sido cerrada!')
+        messages.info(request, f'Hasta pronto, {nombre}. Tu sesion ha sido cerrada!')
     return redirect('accounts:login')
 
 
@@ -125,5 +125,5 @@ def validar_email(request):
     
     return JsonResponse({
         'available': not exists,
-        'message': 'Correo disponible' if not exists else 'Este correo ya está registrado'
+        'message': 'Correo disponible' if not exists else 'Este correo ya esta registrado'
     })

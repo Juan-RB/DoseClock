@@ -67,7 +67,7 @@ class TratamientoForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={
             'class': 'form-control',
             'type': 'datetime-local',
-            'aria-label': 'Hora de última toma'
+            'aria-label': 'Hora de ultima toma'
         })
     )
     
@@ -88,9 +88,9 @@ class TratamientoForm(forms.ModelForm):
             }),
             'duracion_dias': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Días de tratamiento',
+                'placeholder': 'Dias de tratamiento',
                 'min': 1,
-                'aria-label': 'Duración en días'
+                'aria-label': 'Duracion en dias'
             }),
             'es_indefinido': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
@@ -105,7 +105,7 @@ class TratamientoForm(forms.ModelForm):
             }),
             'modo_calculo': forms.Select(attrs={
                 'class': 'form-select',
-                'aria-label': 'Modo de cálculo'
+                'aria-label': 'Modo de calculo'
             }),
             'notas': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -153,7 +153,7 @@ class ConfiguracionForm(forms.ModelForm):
             }),
             'tamano_texto': forms.Select(attrs={
                 'class': 'form-select',
-                'aria-label': 'Tamaó±o de texto'
+                'aria-label': 'Tamano de texto'
             }),
             'alto_contraste': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
@@ -169,11 +169,11 @@ class ConfiguracionForm(forms.ModelForm):
             }),
             'sonido_notificacion': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
-                'aria-label': 'Sonido de notificació³n'
+                'aria-label': 'Sonido de notificacion'
             }),
             'backup_automatico': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
-                'aria-label': 'Backup automó¡tico'
+                'aria-label': 'Backup automatico'
             }),
             'frecuencia_backup_dias': forms.NumberInput(attrs={
                 'class': 'form-control',

@@ -10,7 +10,7 @@
             <div class="logo-icon">
                 <i class="bi bi-capsule"></i>
             </div>
-            <h1>Únete a DoseClock</h1>
+            <h1>Unete a DoseClock</h1>
             <p>Crea tu cuenta en segundos</p>
         </div>
         
@@ -65,7 +65,7 @@
             <!-- Email (opcional) -->
             <div class="mb-3">
                 <label class="form-label" for="registro-email">
-                    <i class="bi bi-envelope me-1"></i> Correo electrónico 
+                    <i class="bi bi-envelope me-1"></i> Correo electronico 
                     <span class="text-secondary">(opcional)</span>
                 </label>
                 <div class="input-group-icon">
@@ -79,7 +79,7 @@
                     >
                     <i class="bi bi-envelope input-icon"></i>
                 </div>
-                <div class="form-text">Para recuperar tu cuenta si olvidas la contraseña</div>
+                <div class="form-text">Para recuperar tu cuenta si olvidas la contrasena</div>
                 <div id="email-feedback" class="valid-feedback"></div>
                 {% if form.email.errors %}
                     <div class="invalid-feedback d-block">
@@ -107,7 +107,7 @@
                     >
                     <i class="bi bi-calendar-heart input-icon"></i>
                 </div>
-                <div class="form-text">Requerido para validaciones médicas</div>
+                <div class="form-text">Requerido para validaciones medicas</div>
                 {% if form.edad.errors %}
                     <div class="invalid-feedback d-block">
                         {% for error in form.edad.errors %}{{ error }}{% endfor %}
@@ -133,7 +133,7 @@
                     >
                     <i class="bi bi-at input-icon"></i>
                 </div>
-                <div class="form-text">Único, sin espacios. Ej: juan_perez</div>
+                <div class="form-text">Unico, sin espacios. Ej: juan_perez</div>
                 <div id="username-feedback" class="valid-feedback"></div>
                 {% if form.username.errors %}
                     <div class="invalid-feedback d-block">
@@ -145,7 +145,7 @@
             <!-- Password -->
             <div class="mb-3">
                 <label class="form-label" for="registro-password1">
-                    <i class="bi bi-shield-lock me-1"></i> Contraseña
+                    <i class="bi bi-shield-lock me-1"></i> Contrasena
                 </label>
                 <div class="input-group-icon">
                     <input 
@@ -153,7 +153,7 @@
                         class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
                         id="registro-password1"
                         name="password1"
-                        placeholder="Crea una contraseña segura"
+                        placeholder="Crea una contrasena segura"
                         autocomplete="new-password"
                         required
                     >
@@ -167,11 +167,11 @@
                         <div class="password-strength-fill" id="strength-fill"></div>
                     </div>
                     <ul class="password-requirements" id="password-requirements">
-                        <li id="req-length"><i class="bi bi-circle"></i> Mínimo 8 caracteres</li>
-                        <li id="req-upper"><i class="bi bi-circle"></i> Una letra mayúscula</li>
-                        <li id="req-lower"><i class="bi bi-circle"></i> Una letra minúscula</li>
-                        <li id="req-number"><i class="bi bi-circle"></i> Un número</li>
-                        <li id="req-special"><i class="bi bi-circle"></i> Un carácter especial (!@#$...)</li>
+                            <li id="req-length"><i class="bi bi-circle"></i> Minimo 8 caracteres</li>
+                            <li id="req-upper"><i class="bi bi-circle"></i> Una letra mayuscula</li>
+                        <li id="req-lower"><i class="bi bi-circle"></i> Una letra minuscula</li>
+                        <li id="req-number"><i class="bi bi-circle"></i> Un numero</li>
+                        <li id="req-special"><i class="bi bi-circle"></i> Un caracter especial (!@#$...)</li>
                     </ul>
                 </div>
                 {% if form.password1.errors %}
@@ -184,7 +184,7 @@
             <!-- Confirm Password -->
             <div class="mb-4">
                 <label class="form-label" for="registro-password2">
-                    <i class="bi bi-shield-check me-1"></i> Confirmar contraseña
+                    <i class="bi bi-shield-check me-1"></i> Confirmar contrasena
                 </label>
                 <div class="input-group-icon">
                     <input 
@@ -192,7 +192,7 @@
                         class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
                         id="registro-password2"
                         name="password2"
-                        placeholder="Repite la contraseña"
+                        placeholder="Repite la contrasena"
                         autocomplete="new-password"
                         required
                     >
@@ -222,7 +222,7 @@
         <!-- Login Link -->
         <a href="{% url 'accounts:login' %}" class="btn btn-auth btn-secondary-auth">
             <i class="bi bi-box-arrow-in-right me-2"></i>
-            Iniciar Sesión
+            Iniciar Sesion
         </a>
     </div>
 </div>
@@ -293,12 +293,12 @@
         }
         
         if (password1.value === password2.value) {
-            matchFeedback.textContent = '¡Las contraseñas coinciden!';
+            matchFeedback.textContent = 'Las contrasenas coinciden!';
             matchFeedback.className = 'valid-feedback d-block';
             password2.classList.remove('is-invalid');
             password2.classList.add('is-valid');
         } else {
-            matchFeedback.textContent = 'Las contraseñas no coinciden';
+            matchFeedback.textContent = 'Las contrasenas no coinciden';
             matchFeedback.className = 'invalid-feedback d-block';
             password2.classList.remove('is-valid');
             password2.classList.add('is-invalid');
@@ -374,7 +374,7 @@
         // Basic email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            emailFeedback.textContent = 'Formato de correo inválido';
+            emailFeedback.textContent = 'Formato de correo invalido';
             emailFeedback.className = 'invalid-feedback d-block';
             emailInput.classList.add('is-invalid');
             emailInput.classList.remove('is-valid');

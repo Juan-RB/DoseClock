@@ -41,7 +41,7 @@
             <div class="card-body">
               <h3 class="h6 mb-3">
                 <i class="bi bi-clock me-2" aria-hidden="true"></i>
-                Configuració³n de primera toma
+                Configuracion de primera toma
               </h3>
               
               <div class="form-check mb-3">
@@ -54,11 +54,11 @@
               
               <div id="hora_ultima_container" class="mb-3" style="display: none;">
                 <label for="hora_ultima_toma" class="form-label">
-                  Hora de la óºltima toma
+                  Hora de la ultima toma
                 </label>
                 <input type="datetime-local" class="form-control" id="hora_ultima_toma" 
-                       name="hora_ultima_toma" aria-label="Hora de óºltima toma">
-                <small class="text-muted">Indica cuó¡ndo fue la óºltima vez que tomaste este medicamento</small>
+                       name="hora_ultima_toma" aria-label="Hora de ultima toma">
+                <small class="text-muted">Indica cuando fue la ultima vez que tomaste este medicamento</small>
               </div>
             </div>
           </div>
@@ -82,11 +82,11 @@
             </div>
           </div>
           
-          <!-- Duració³n -->
+          <!-- Duracion -->
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="id_duracion_dias" class="form-label">
-                Duració³n (dó­as)
+                Duracion (dias)
               </label>
               {{ form.duracion_dias }}
             </div>
@@ -100,15 +100,15 @@
             </div>
           </div>
           
-          <!-- Modo de có¡lculo -->
+          <!-- Modo de calculo -->
           <div class="mb-3">
             <label for="id_modo_calculo" class="form-label">
-              Modo de có¡lculo de pró³ximas tomas
+              Modo de calculo de proximas tomas
             </label>
             {{ form.modo_calculo }}
             <small class="text-muted d-block mt-1">
               <strong>Desde hora programada:</strong> La siguiente toma se calcula desde la hora originalmente programada.<br>
-              <strong>Desde hora de confirmació³n:</strong> La siguiente toma se calcula desde cuando confirmaste la toma.
+              <strong>Desde hora de confirmacion:</strong> La siguiente toma se calcula desde cuando confirmaste la toma.
             </small>
           </div>
           
@@ -149,7 +149,7 @@
     const esIndefinido = document.getElementById('id_es_indefinido');
     const duracionDias = document.getElementById('id_duracion_dias');
     
-    // Toggle hora óºltima toma
+    // Toggle hora ultima toma
     primeraToma?.addEventListener('change', function() {
       horaContainer.style.display = this.checked ? 'none' : 'block';
     });

@@ -80,7 +80,7 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .catch(() => {
           return new Response(
-            JSON.stringify({ error: 'Offline', message: 'Sin conexión a internet' }),
+            JSON.stringify({ error: 'Offline', message: 'Sin conexion a internet' }),
             { headers: { 'Content-Type': 'application/json' } }
           );
         })

@@ -16,13 +16,13 @@ from medicamentos.utils.telegram_bot import (
 
 
 class Command(BaseCommand):
-    help = 'Envía recordatorios de medicamentos por Telegram'
+    help = 'Envia recordatorios de medicamentos por Telegram'
 
     def add_arguments(self, parser):
         parser.add_argument(
             '--dry-run',
             action='store_true',
-            help='Muestra qué se enviaría sin enviar realmente',
+            help='Muestra que se enviaria sin enviar realmente',
         )
 
     def handle(self, *args, **options):
@@ -56,12 +56,12 @@ class Command(BaseCommand):
             enviar_anticipado = config.recordatorio_anticipado
             
             if not usuario:
-                self.stdout.write(self.style.WARNING(f'Configuración sin usuario asociado (ID: {config.id})'))
+                self.stdout.write(self.style.WARNING(f'Configuracion sin usuario asociado (ID: {config.id})'))
                 continue
             
             self.stdout.write(f"\n--- Usuario: {usuario.username} ---")
             self.stdout.write(f"Chat ID: {chat_id}")
-            self.stdout.write(f"Recordatorio anticipado (5 min): {'Sí' if enviar_anticipado else 'No'}")
+            self.stdout.write(f"Recordatorio anticipado (5 min): {'Si' if enviar_anticipado else 'No'}")
             
             enviados_anticipados = 0
             enviados_exactos = 0
@@ -125,7 +125,7 @@ class Command(BaseCommand):
                                 ))
                         else:
                             self.stdout.write(self.style.WARNING(
-                                f"     [DRY-RUN] Se enviaría recordatorio anticipado"
+                                f"     [DRY-RUN] Se enviaria recordatorio anticipado"
                             ))
                             enviados_anticipados += 1
                     else:
@@ -171,7 +171,7 @@ class Command(BaseCommand):
                                 ))
                         else:
                             self.stdout.write(self.style.WARNING(
-                                f"     [DRY-RUN] Se enviaría recordatorio exacto"
+                                f"     [DRY-RUN] Se enviaria recordatorio exacto"
                             ))
                             enviados_exactos += 1
                     else:

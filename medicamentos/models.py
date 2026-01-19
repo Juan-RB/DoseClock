@@ -35,7 +35,7 @@ class Medicamento(models.Model):
         blank=True, 
         null=True,
         verbose_name="Color identificador",
-        help_text="Código hexadecimal (ej: #FF5733)"
+        help_text="Codigo hexadecimal (ej: #FF5733)"
     )
     icono = models.CharField(
         max_length=50, 
@@ -64,7 +64,7 @@ class Tratamiento(models.Model):
     """
     MODO_CALCULO_CHOICES = [
         ('programada', 'Desde hora programada'),
-        ('confirmacion', 'Desde hora de confirmación'),
+        ('confirmacion', 'Desde hora de confirmacion'),
     ]
     
     ESTADO_CHOICES = [
@@ -107,8 +107,8 @@ class Tratamiento(models.Model):
     duracion_dias = models.PositiveIntegerField(
         blank=True, 
         null=True,
-        verbose_name="Duración en días",
-        help_text="Dejar vacío para tratamiento indefinido"
+        verbose_name="Duracion en dias",
+        help_text="Dejar vacio para tratamiento indefinido"
     )
     es_indefinido = models.BooleanField(
         default=False, 
@@ -124,8 +124,8 @@ class Tratamiento(models.Model):
         max_length=20,
         choices=MODO_CALCULO_CHOICES,
         default='programada',
-        verbose_name="Modo de cálculo",
-        help_text="Determina cómo se calcula la siguiente toma"
+        verbose_name="Modo de calculo",
+        help_text="Determina como se calcula la siguiente toma"
     )
     estado = models.CharField(
         max_length=20,
@@ -199,7 +199,7 @@ class Toma(models.Model):
     hora_confirmada = models.DateTimeField(
         blank=True, 
         null=True,
-        verbose_name="Hora de confirmación"
+        verbose_name="Hora de confirmacion"
     )
     estado = models.CharField(
         max_length=20,
@@ -249,7 +249,7 @@ class Notificacion(models.Model):
     Can be main notification or reminder.
     """
     TIPO_CHOICES = [
-        ('principal', 'Notificación principal'),
+        ('principal', 'Notificacion principal'),
         ('recordatorio', 'Recordatorio anticipado'),
     ]
 
@@ -263,18 +263,18 @@ class Notificacion(models.Model):
         max_length=20,
         choices=TIPO_CHOICES,
         default='principal',
-        verbose_name="Tipo de notificación"
+        verbose_name="Tipo de notificacion"
     )
     hora_programada = models.DateTimeField(verbose_name="Hora programada")
     enviada = models.BooleanField(default=False, verbose_name="Enviada")
     fecha_envio = models.DateTimeField(
         blank=True, 
         null=True,
-        verbose_name="Fecha de envío"
+        verbose_name="Fecha de envio"
     )
 
     class Meta:
-        verbose_name = "Notificación"
+        verbose_name = "Notificacion"
         verbose_name_plural = "Notificaciones"
         ordering = ['-hora_programada']
 
@@ -302,7 +302,7 @@ class ConfiguracionUsuario(models.Model):
         ('nude', 'Nude (Tonos neutros)'),
         ('azul', 'Azul Sereno'),
         ('verde', 'Verde Natural'),
-        ('purpura', 'Púrpura Suave'),
+        ('purpura', 'Purpura Suave'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -330,7 +330,7 @@ class ConfiguracionUsuario(models.Model):
         max_length=20,
         choices=TAMANO_TEXTO_CHOICES,
         default='normal',
-        verbose_name="Tamaño de texto"
+        verbose_name="Tamano de texto"
     )
     alto_contraste = models.BooleanField(
         default=False, 
@@ -350,16 +350,16 @@ class ConfiguracionUsuario(models.Model):
     )
     backup_automatico = models.BooleanField(
         default=False,
-        verbose_name="Backup automático"
+        verbose_name="Backup automatico"
     )
     frecuencia_backup_dias = models.PositiveIntegerField(
         default=7,
-        verbose_name="Frecuencia de backup (días)"
+        verbose_name="Frecuencia de backup (dias)"
     )
     ultimo_backup = models.DateTimeField(
         blank=True, 
         null=True,
-        verbose_name="Último backup"
+        verbose_name="Ultimo backup"
     )
     
     # Telegram Integration
@@ -383,12 +383,12 @@ class ConfiguracionUsuario(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Configuración de Usuario"
+        verbose_name = "Configuracion de Usuario"
         verbose_name_plural = "Configuraciones de Usuario"
 
     def __str__(self):
         if self.usuario:
-            return f"Configuración de {self.usuario.username}"
-        return "Configuración sin usuario"
+            return f"Configuracion de {self.usuario.username}"
+        return "Configuracion sin usuario"
 
 

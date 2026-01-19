@@ -205,7 +205,7 @@ def validate_backup(filepath):
     except json.JSONDecodeError:
         return {
             'valid': False,
-            'error': "Archivo JSON invó¡lido"
+            'error': "Archivo JSON invalido"
         }
     except FileNotFoundError:
         return {

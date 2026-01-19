@@ -24,7 +24,7 @@
       <tr>
         <th scope="col">Archivo</th>
         <th scope="col">Fecha</th>
-        <th scope="col">Tamaó±o</th>
+        <th scope="col">Tamano</th>
         <th scope="col">Estado</th>
         <th scope="col">Acciones</th>
       </tr>
@@ -40,9 +40,9 @@
         <td>{{ backup.size_bytes|filesizeformat }}</td>
         <td>
           {% if backup.valid %}
-          <span class="badge bg-success">Vó¡lido</span>
+          <span class="badge bg-success">Valido</span>
           {% else %}
-          <span class="badge bg-danger">Invó¡lido</span>
+          <span class="badge bg-danger">Invalido</span>
           {% endif %}
         </td>
         <td>
