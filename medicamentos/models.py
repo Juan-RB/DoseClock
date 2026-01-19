@@ -12,6 +12,7 @@ Entities:
 import uuid
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Medicamento(models.Model):
@@ -20,6 +21,14 @@ class Medicamento(models.Model):
     Each medication can have multiple active treatments.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='medicamentos',
+        verbose_name="Usuario",
+        null=True,  # Temporarily nullable for migration
+        blank=True
+    )
     nombre = models.CharField(max_length=200, verbose_name="Nombre del medicamento")
     color = models.CharField(
         max_length=7, 
@@ -72,6 +81,14 @@ class Tratamiento(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='tratamientos',
+        verbose_name="Usuario",
+        null=True,  # Temporarily nullable for migration
+        blank=True
+    )
     medicamento = models.ForeignKey(
         Medicamento, 
         on_delete=models.SET_NULL,
@@ -268,7 +285,7 @@ class Notificacion(models.Model):
 class ConfiguracionUsuario(models.Model):
     """
     User configuration and preferences.
-    Singleton model (only one record).
+    One configuration per user.
     """
     MODO_VISUAL_CHOICES = [
         ('minimalista', 'Modo Minimalista'),
@@ -289,6 +306,14 @@ class ConfiguracionUsuario(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    usuario = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='configuracion',
+        verbose_name="Usuario",
+        null=True,  # Temporarily nullable for migration
+        blank=True
+    )
     modo_visual = models.CharField(
         max_length=20,
         choices=MODO_VISUAL_CHOICES,
@@ -359,18 +384,11 @@ class ConfiguracionUsuario(models.Model):
 
     class Meta:
         verbose_name = "Configuración de Usuario"
-        verbose_name_plural = "Configuración de Usuario"
+        verbose_name_plural = "Configuraciones de Usuario"
 
     def __str__(self):
-        return "Configuración del Sistema"
-
-    def save(self, *args, **kwargs):
-        """Ensure only one configuration exists (singleton pattern)."""
-        if not self.pk and ConfiguracionUsuario.objects.exists():
-            # Update existing record instead of creating new
-            existing = ConfiguracionUsuario.objects.first()
-            self.pk = existing.pk
-        super().save(*args, **kwargs)
-
+        if self.usuario:
+            return f"Configuración de {self.usuario.username}"
+        return "Configuración sin usuario"
 
 

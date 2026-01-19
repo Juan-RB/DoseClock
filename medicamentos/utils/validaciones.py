@@ -7,10 +7,13 @@ from datetime import timedelta
 from django.utils import timezone
 
 
-def validate_and_update_doses():
+def validate_and_update_doses(user=None):
     """
     Check all pending doses and update their status if needed.
     Marks doses as 'no_tomada' if grace period has passed.
+
+    Args:
+        user: User model instance to filter doses (optional)
 
     Returns:
         dict: Update statistics
@@ -22,12 +25,15 @@ def validate_and_update_doses():
     cutoff_time = timezone.now() - timedelta(minutes=grace_minutes)
 
     # Find pending doses past grace period
-    overdue_doses = Toma.objects.filter(
+    queryset = Toma.objects.filter(
         estado='pendiente',
         hora_programada__lt=cutoff_time
     )
+    
+    if user and user.is_authenticated:
+        queryset = queryset.filter(tratamiento__usuario=user)
 
-    updated_count = overdue_doses.update(estado='no_tomada')
+    updated_count = queryset.update(estado='no_tomada')
 
     return {
         'checked': True,

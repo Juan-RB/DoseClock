@@ -122,19 +122,31 @@ def get_notification_data(notification):
     }
 
 
-def get_user_config():
+def get_user_config(user=None):
     """
     Get or create user configuration.
+    
+    Args:
+        user: User model instance (optional for backward compatibility)
     
     Returns:
         ConfiguracionUsuario: User configuration instance
     """
     from medicamentos.models import ConfiguracionUsuario
     
-    config = ConfiguracionUsuario.objects.first()
-    if not config:
-        config = ConfiguracionUsuario.objects.create()
-    return config
+    if user and user.is_authenticated:
+        config, created = ConfiguracionUsuario.objects.get_or_create(
+            usuario=user,
+            defaults={
+                'modo_visual': 'minimalista',
+                'paleta_colores': 'nude',
+                'tamano_texto': 'normal'
+            }
+        )
+        return config
+    
+    # Fallback for unauthenticated or no user provided
+    return None
 
 
 def should_send_notification(notification):
@@ -147,7 +159,12 @@ def should_send_notification(notification):
     Returns:
         bool: True if notification should be sent
     """
-    config = get_user_config()
+    # Get user from the dose's treatment
+    user = None
+    if notification.toma and notification.toma.tratamiento:
+        user = notification.toma.tratamiento.usuario
+    
+    config = get_user_config(user)
     
     # Check if notifications are enabled
     if not config.notificaciones_activas:
@@ -188,9 +205,12 @@ def cancel_dose_notifications(dose):
     return count
 
 
-def get_notification_schedule():
+def get_notification_schedule(user=None):
     """
     Get upcoming notification schedule for display.
+    
+    Args:
+        user: User model instance to filter notifications
     
     Returns:
         list: Upcoming notifications with timing info
@@ -200,11 +220,16 @@ def get_notification_schedule():
     now = timezone.now()
     future_limit = now + timedelta(hours=24)
     
-    notifications = Notificacion.objects.filter(
+    queryset = Notificacion.objects.filter(
         enviada=False,
         hora_programada__range=(now, future_limit),
         toma__tratamiento__estado='activo'
-    ).select_related(
+    )
+    
+    if user and user.is_authenticated:
+        queryset = queryset.filter(toma__tratamiento__usuario=user)
+    
+    notifications = queryset.select_related(
         'toma', 
         'toma__tratamiento', 
         'toma__tratamiento__medicamento'

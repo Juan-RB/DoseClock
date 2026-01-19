@@ -87,9 +87,31 @@
                href="{% url 'medicamentos:configuracion' %}"
                aria-label="Configuracion">
               <i class="bi bi-gear me-1" aria-hidden="true"></i>
-              <span class="d-lg-none">Configuracion</span>
+              <span class="d-lg-none">Configuración</span>
             </a>
           </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle me-1" aria-hidden="true"></i>
+              <span>{{ user.perfil.nombre_completo|default:user.username }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li>
+                <a class="dropdown-item" href="{% url 'accounts:perfil' %}">
+                  <i class="bi bi-person me-2"></i> Mi Perfil
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                  <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                </a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>

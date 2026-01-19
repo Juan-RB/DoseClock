@@ -1,0 +1,410 @@
+{% extends 'accounts/base_auth.html' %}
+
+{% block title %}Crear Cuenta - DoseClock{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card glass-card">
+        <!-- Logo -->
+        <div class="auth-logo">
+            <div class="logo-icon">
+                <i class="bi bi-capsule"></i>
+            </div>
+            <h1>Únete a DoseClock</h1>
+            <p>Crea tu cuenta en segundos</p>
+        </div>
+        
+        <!-- Alerts -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-auth alert-{{ message.tags }}">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert-auth alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                {% for error in form.non_field_errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Register Form -->
+        <form method="post" id="register-form" novalidate>
+            {% csrf_token %}
+            
+            <!-- Nombre Completo -->
+            <div class="mb-3">
+                <label class="form-label" for="registro-nombre">
+                    <i class="bi bi-person-badge me-1"></i> Nombre completo
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="text" 
+                        class="form-control {% if form.nombre_completo.errors %}is-invalid{% endif %}"
+                        id="registro-nombre"
+                        name="nombre_completo"
+                        placeholder="Tu nombre real"
+                        value="{{ form.nombre_completo.value|default:'' }}"
+                        required
+                    >
+                    <i class="bi bi-person-badge input-icon"></i>
+                </div>
+                <div class="form-text">Tu nombre real para identificarte</div>
+                {% if form.nombre_completo.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.nombre_completo.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Email (opcional) -->
+            <div class="mb-3">
+                <label class="form-label" for="registro-email">
+                    <i class="bi bi-envelope me-1"></i> Correo electrónico 
+                    <span class="text-secondary">(opcional)</span>
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="email" 
+                        class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                        id="registro-email"
+                        name="email"
+                        placeholder="correo@ejemplo.com"
+                        value="{{ form.email.value|default:'' }}"
+                    >
+                    <i class="bi bi-envelope input-icon"></i>
+                </div>
+                <div class="form-text">Para recuperar tu cuenta si olvidas la contraseña</div>
+                <div id="email-feedback" class="valid-feedback"></div>
+                {% if form.email.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.email.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Edad -->
+            <div class="mb-3">
+                <label class="form-label" for="registro-edad">
+                    <i class="bi bi-calendar-heart me-1"></i> Edad
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="number" 
+                        class="form-control {% if form.edad.errors %}is-invalid{% endif %}"
+                        id="registro-edad"
+                        name="edad"
+                        placeholder="Tu edad"
+                        value="{{ form.edad.value|default:'' }}"
+                        min="1"
+                        max="120"
+                        required
+                    >
+                    <i class="bi bi-calendar-heart input-icon"></i>
+                </div>
+                <div class="form-text">Requerido para validaciones médicas</div>
+                {% if form.edad.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.edad.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Username -->
+            <div class="mb-3">
+                <label class="form-label" for="registro-username">
+                    <i class="bi bi-at me-1"></i> Nombre de usuario
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="text" 
+                        class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                        id="registro-username"
+                        name="username"
+                        placeholder="usuario_ejemplo"
+                        value="{{ form.username.value|default:'' }}"
+                        autocomplete="username"
+                        required
+                    >
+                    <i class="bi bi-at input-icon"></i>
+                </div>
+                <div class="form-text">Único, sin espacios. Ej: juan_perez</div>
+                <div id="username-feedback" class="valid-feedback"></div>
+                {% if form.username.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.username.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Password -->
+            <div class="mb-3">
+                <label class="form-label" for="registro-password1">
+                    <i class="bi bi-shield-lock me-1"></i> Contraseña
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="password" 
+                        class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                        id="registro-password1"
+                        name="password1"
+                        placeholder="Crea una contraseña segura"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <i class="bi bi-shield-lock input-icon"></i>
+                    <i class="bi bi-eye toggle-password" onclick="togglePassword('registro-password1', this)"></i>
+                </div>
+                
+                <!-- Password Strength Indicator -->
+                <div class="password-strength">
+                    <div class="password-strength-bar">
+                        <div class="password-strength-fill" id="strength-fill"></div>
+                    </div>
+                    <ul class="password-requirements" id="password-requirements">
+                        <li id="req-length"><i class="bi bi-circle"></i> Mínimo 8 caracteres</li>
+                        <li id="req-upper"><i class="bi bi-circle"></i> Una letra mayúscula</li>
+                        <li id="req-lower"><i class="bi bi-circle"></i> Una letra minúscula</li>
+                        <li id="req-number"><i class="bi bi-circle"></i> Un número</li>
+                        <li id="req-special"><i class="bi bi-circle"></i> Un carácter especial (!@#$...)</li>
+                    </ul>
+                </div>
+                {% if form.password1.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.password1.errors %}{{ error }}<br>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Confirm Password -->
+            <div class="mb-4">
+                <label class="form-label" for="registro-password2">
+                    <i class="bi bi-shield-check me-1"></i> Confirmar contraseña
+                </label>
+                <div class="input-group-icon">
+                    <input 
+                        type="password" 
+                        class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                        id="registro-password2"
+                        name="password2"
+                        placeholder="Repite la contraseña"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <i class="bi bi-shield-check input-icon"></i>
+                    <i class="bi bi-eye toggle-password" onclick="togglePassword('registro-password2', this)"></i>
+                </div>
+                <div id="password-match-feedback" class="invalid-feedback"></div>
+                {% if form.password2.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-auth btn-primary-auth mb-3" id="submit-btn">
+                <i class="bi bi-person-plus me-2"></i>
+                Crear Cuenta
+            </button>
+        </form>
+        
+        <!-- Divider -->
+        <div class="auth-divider">
+            <span>¿Ya tienes cuenta?</span>
+        </div>
+        
+        <!-- Login Link -->
+        <a href="{% url 'accounts:login' %}" class="btn btn-auth btn-secondary-auth">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Iniciar Sesión
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+    
+    // Password strength validation
+    const password1 = document.getElementById('registro-password1');
+    const password2 = document.getElementById('registro-password2');
+    const strengthFill = document.getElementById('strength-fill');
+    const matchFeedback = document.getElementById('password-match-feedback');
+    
+    const requirements = {
+        length: { el: document.getElementById('req-length'), regex: /.{8,}/ },
+        upper: { el: document.getElementById('req-upper'), regex: /[A-Z]/ },
+        lower: { el: document.getElementById('req-lower'), regex: /[a-z]/ },
+        number: { el: document.getElementById('req-number'), regex: /[0-9]/ },
+        special: { el: document.getElementById('req-special'), regex: /[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;'`~]/ }
+    };
+    
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        
+        for (const [key, req] of Object.entries(requirements)) {
+            const isValid = req.regex.test(password);
+            req.el.classList.toggle('valid', isValid);
+            req.el.querySelector('i').className = isValid ? 'bi bi-check-circle-fill' : 'bi bi-circle';
+            if (isValid) strength++;
+        }
+        
+        // Update strength bar
+        strengthFill.className = 'password-strength-fill';
+        if (strength === 0) {
+            strengthFill.style.width = '0%';
+        } else if (strength <= 2) {
+            strengthFill.classList.add('weak');
+        } else if (strength === 3) {
+            strengthFill.classList.add('fair');
+        } else if (strength === 4) {
+            strengthFill.classList.add('good');
+        } else {
+            strengthFill.classList.add('strong');
+        }
+        
+        return strength;
+    }
+    
+    function checkPasswordMatch() {
+        if (password2.value === '') {
+            matchFeedback.style.display = 'none';
+            password2.classList.remove('is-valid', 'is-invalid');
+            return;
+        }
+        
+        if (password1.value === password2.value) {
+            matchFeedback.textContent = '¡Las contraseñas coinciden!';
+            matchFeedback.className = 'valid-feedback d-block';
+            password2.classList.remove('is-invalid');
+            password2.classList.add('is-valid');
+        } else {
+            matchFeedback.textContent = 'Las contraseñas no coinciden';
+            matchFeedback.className = 'invalid-feedback d-block';
+            password2.classList.remove('is-valid');
+            password2.classList.add('is-invalid');
+        }
+    }
+    
+    password1.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+        if (password2.value) checkPasswordMatch();
+    });
+    
+    password2.addEventListener('input', checkPasswordMatch);
+    
+    // Username availability check
+    const usernameInput = document.getElementById('registro-username');
+    const usernameFeedback = document.getElementById('username-feedback');
+    let usernameTimeout;
+    
+    usernameInput.addEventListener('input', function() {
+        clearTimeout(usernameTimeout);
+        const username = this.value.trim();
+        
+        if (username.length < 3) {
+            usernameFeedback.style.display = 'none';
+            usernameInput.classList.remove('is-valid', 'is-invalid');
+            return;
+        }
+        
+        if (username.includes(' ')) {
+            usernameFeedback.textContent = 'No puede contener espacios';
+            usernameFeedback.className = 'invalid-feedback d-block';
+            usernameInput.classList.add('is-invalid');
+            usernameInput.classList.remove('is-valid');
+            return;
+        }
+        
+        usernameTimeout = setTimeout(async function() {
+            try {
+                const response = await fetch(`{% url 'accounts:validar_username' %}?username=${encodeURIComponent(username)}`);
+                const data = await response.json();
+                
+                usernameFeedback.textContent = data.message;
+                if (data.available) {
+                    usernameFeedback.className = 'valid-feedback d-block';
+                    usernameInput.classList.add('is-valid');
+                    usernameInput.classList.remove('is-invalid');
+                } else {
+                    usernameFeedback.className = 'invalid-feedback d-block';
+                    usernameInput.classList.add('is-invalid');
+                    usernameInput.classList.remove('is-valid');
+                }
+            } catch (error) {
+                console.error('Error checking username:', error);
+            }
+        }, 500);
+    });
+    
+    // Email availability check
+    const emailInput = document.getElementById('registro-email');
+    const emailFeedback = document.getElementById('email-feedback');
+    let emailTimeout;
+    
+    emailInput.addEventListener('input', function() {
+        clearTimeout(emailTimeout);
+        const email = this.value.trim();
+        
+        if (!email) {
+            emailFeedback.style.display = 'none';
+            emailInput.classList.remove('is-valid', 'is-invalid');
+            return;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            emailFeedback.textContent = 'Formato de correo inválido';
+            emailFeedback.className = 'invalid-feedback d-block';
+            emailInput.classList.add('is-invalid');
+            emailInput.classList.remove('is-valid');
+            return;
+        }
+        
+        emailTimeout = setTimeout(async function() {
+            try {
+                const response = await fetch(`{% url 'accounts:validar_email' %}?email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                
+                emailFeedback.textContent = data.message;
+                if (data.available) {
+                    emailFeedback.className = 'valid-feedback d-block';
+                    emailInput.classList.add('is-valid');
+                    emailInput.classList.remove('is-invalid');
+                } else {
+                    emailFeedback.className = 'invalid-feedback d-block';
+                    emailInput.classList.add('is-invalid');
+                    emailInput.classList.remove('is-valid');
+                }
+            } catch (error) {
+                console.error('Error checking email:', error);
+            }
+        }, 500);
+    });
+    
+    // Auto-focus on first field
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('registro-nombre').focus();
+    });
+</script>
+{% endblock %}

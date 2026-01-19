@@ -67,7 +67,7 @@ class TratamientoForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={
             'class': 'form-control',
             'type': 'datetime-local',
-            'aria-label': 'Hora de óºltima toma'
+            'aria-label': 'Hora de última toma'
         })
     )
     
@@ -88,9 +88,9 @@ class TratamientoForm(forms.ModelForm):
             }),
             'duracion_dias': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Dó­as de tratamiento',
+                'placeholder': 'Días de tratamiento',
                 'min': 1,
-                'aria-label': 'Duració³n en dó­as'
+                'aria-label': 'Duración en días'
             }),
             'es_indefinido': forms.CheckboxInput(attrs={
                 'class': 'form-check-input',
@@ -105,7 +105,7 @@ class TratamientoForm(forms.ModelForm):
             }),
             'modo_calculo': forms.Select(attrs={
                 'class': 'form-select',
-                'aria-label': 'Modo de có¡lculo'
+                'aria-label': 'Modo de cálculo'
             }),
             'notas': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -114,6 +114,16 @@ class TratamientoForm(forms.ModelForm):
                 'aria-label': 'Notas del tratamiento'
             }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        # Filter medications by user
+        if self.user:
+            self.fields['medicamento'].queryset = Medicamento.objects.filter(
+                usuario=self.user,
+                activo=True
+            )
 
 
 class ConfiguracionForm(forms.ModelForm):

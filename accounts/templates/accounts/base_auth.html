@@ -1,0 +1,471 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DoseClock{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --success-color: #00d9a5;
+            --error-color: #ff6b6b;
+            --warning-color: #feca57;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: var(--primary-gradient);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animated::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 75, 162, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
+        }
+        
+        /* Floating Pills Animation */
+        .floating-pills {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .pill {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: floatPill 15s ease-in-out infinite;
+        }
+        
+        .pill:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .pill:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+        .pill:nth-child(3) { top: 60%; left: 5%; animation-delay: 4s; }
+        .pill:nth-child(4) { top: 80%; right: 10%; animation-delay: 6s; }
+        .pill:nth-child(5) { top: 40%; left: 85%; animation-delay: 8s; }
+        .pill:nth-child(6) { top: 70%; left: 50%; animation-delay: 10s; }
+        
+        @keyframes floatPill {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(15deg); }
+        }
+        
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Auth Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Logo */
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-logo .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .auth-logo .logo-icon i {
+            font-size: 2.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .auth-logo h1 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-logo p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* Form Styles */
+        .form-floating {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: white;
+            padding: 1rem 1rem 1rem 3rem;
+            height: auto;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .form-control.is-invalid {
+            border-color: var(--error-color);
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .form-control.is-valid {
+            border-color: var(--success-color);
+            background: rgba(0, 217, 165, 0.1);
+        }
+        
+        /* Input Group with Icon */
+        .input-group-icon {
+            position: relative;
+        }
+        
+        .input-group-icon .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 10;
+            transition: color 0.3s ease;
+        }
+        
+        .input-group-icon .form-control:focus + .input-icon,
+        .input-group-icon .form-control:not(:placeholder-shown) + .input-icon {
+            color: white;
+        }
+        
+        .input-group-icon .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            z-index: 10;
+            transition: color 0.3s ease;
+        }
+        
+        .input-group-icon .toggle-password:hover {
+            color: white;
+        }
+        
+        /* Labels */
+        .form-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Help Text */
+        .form-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Error Messages */
+        .invalid-feedback {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .valid-feedback {
+            color: var(--success-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Buttons */
+        .btn-auth {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary-auth {
+            background: white;
+            color: #667eea;
+        }
+        
+        .btn-primary-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary-auth:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary-auth {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary-auth:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Links */
+        .auth-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .auth-link:hover {
+            color: white;
+        }
+        
+        .auth-link-primary {
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-divider span {
+            padding: 0 1rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Alerts */
+        .alert-auth {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        .alert-auth.alert-danger {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+        
+        .alert-auth.alert-success {
+            background: rgba(0, 217, 165, 0.2);
+            border-color: rgba(0, 217, 165, 0.3);
+        }
+        
+        /* Password Strength Indicator */
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+        
+        .password-strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+        
+        .password-strength-fill.weak { width: 25%; background: var(--error-color); }
+        .password-strength-fill.fair { width: 50%; background: var(--warning-color); }
+        .password-strength-fill.good { width: 75%; background: #54a0ff; }
+        .password-strength-fill.strong { width: 100%; background: var(--success-color); }
+        
+        .password-requirements {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.75rem;
+        }
+        
+        .password-requirements li {
+            color: rgba(255, 255, 255, 0.5);
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .password-requirements li.valid {
+            color: var(--success-color);
+        }
+        
+        .password-requirements li i {
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 576px) {
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .auth-logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .pill {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animated"></div>
+    
+    <!-- Floating Pills -->
+    <div class="floating-pills">
+        <div class="pill">💊</div>
+        <div class="pill">💉</div>
+        <div class="pill">🏥</div>
+        <div class="pill">⏰</div>
+        <div class="pill">❤️</div>
+        <div class="pill">🩺</div>
+    </div>
+    
+    {% block content %}{% endblock %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

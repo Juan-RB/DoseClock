@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
@@ -42,9 +43,9 @@ from .utils.validaciones import (
 )
 
 
-def get_context_base():
+def get_context_base(request):
     """Get base context with user configuration."""
-    config = get_user_config()
+    config = get_user_config(request.user)
     return {
         'config': config,
         'modo_visual': config.modo_visual if config else 'minimalista',
@@ -56,15 +57,17 @@ def get_context_base():
 
 # ==================== DASHBOARD ====================
 
+@login_required
 def dashboard(request):
     """Main dashboard view showing active treatments and upcoming doses."""
-    # Update pending doses status
-    validate_and_update_doses()
+    # Update pending doses status for current user
+    validate_and_update_doses(request.user)
     
-    context = get_context_base()
+    context = get_context_base(request)
     
-    # Get active treatments
+    # Get active treatments for current user
     treatments = Tratamiento.objects.filter(
+        usuario=request.user,
         estado='activo'
     ).select_related('medicamento')
     
@@ -113,21 +116,25 @@ def dashboard(request):
 
 # ==================== MEDICAMENTOS ====================
 
+@login_required
 def medicamentos_list(request):
-    """List all medications."""
-    context = get_context_base()
-    context['medicamentos'] = Medicamento.objects.filter(activo=True)
+    """List all medications for current user."""
+    context = get_context_base(request)
+    context['medicamentos'] = Medicamento.objects.filter(usuario=request.user, activo=True)
     return render(request, 'medicamentos/medicamentos_list.html', context)
 
 
+@login_required
 def medicamento_create(request):
-    """Create new medication."""
-    context = get_context_base()
+    """Create new medication for current user."""
+    context = get_context_base(request)
     
     if request.method == 'POST':
         form = MedicamentoForm(request.POST)
         if form.is_valid():
-            medicamento = form.save()
+            medicamento = form.save(commit=False)
+            medicamento.usuario = request.user
+            medicamento.save()
             messages.success(request, f'Medicamento "{medicamento.nombre}" creado correctamente.')
             return redirect('medicamentos:medicamentos_list')
     else:
@@ -138,10 +145,11 @@ def medicamento_create(request):
     return render(request, 'medicamentos/medicamento_form.html', context)
 
 
+@login_required
 def medicamento_detail(request, pk):
     """View medication details."""
-    context = get_context_base()
-    medicamento = get_object_or_404(Medicamento, pk=pk)
+    context = get_context_base(request)
+    medicamento = get_object_or_404(Medicamento, pk=pk, usuario=request.user)
     
     context['medicamento'] = medicamento
     context['tratamientos'] = medicamento.tratamientos.all()
@@ -149,10 +157,11 @@ def medicamento_detail(request, pk):
     return render(request, 'medicamentos/medicamento_detail.html', context)
 
 
+@login_required
 def medicamento_edit(request, pk):
     """Edit medication."""
-    context = get_context_base()
-    medicamento = get_object_or_404(Medicamento, pk=pk)
+    context = get_context_base(request)
+    medicamento = get_object_or_404(Medicamento, pk=pk, usuario=request.user)
     
     if request.method == 'POST':
         form = MedicamentoForm(request.POST, instance=medicamento)
@@ -169,9 +178,10 @@ def medicamento_edit(request, pk):
     return render(request, 'medicamentos/medicamento_form.html', context)
 
 
+@login_required
 def medicamento_delete(request, pk):
     """Delete medication preserving history."""
-    medicamento = get_object_or_404(Medicamento, pk=pk)
+    medicamento = get_object_or_404(Medicamento, pk=pk, usuario=request.user)
     
     if request.method == 'POST':
         nombre = medicamento.nombre
@@ -193,7 +203,7 @@ def medicamento_delete(request, pk):
         messages.success(request, f'Medicamento "{nombre}" eliminado. El historial se mantiene.')
         return redirect('medicamentos:medicamentos_list')
     
-    context = get_context_base()
+    context = get_context_base(request)
     context['medicamento'] = medicamento
     context['tratamientos_activos'] = medicamento.tratamientos.filter(estado='activo').count()
     context['total_tomas'] = Toma.objects.filter(tratamiento__medicamento=medicamento).count()
@@ -202,21 +212,24 @@ def medicamento_delete(request, pk):
 
 # ==================== TRATAMIENTOS ====================
 
+@login_required
 def tratamientos_list(request):
-    """List all treatments."""
-    context = get_context_base()
-    context['tratamientos'] = Tratamiento.objects.select_related('medicamento').all()
+    """List all treatments for current user."""
+    context = get_context_base(request)
+    context['tratamientos'] = Tratamiento.objects.filter(usuario=request.user).select_related('medicamento')
     return render(request, 'medicamentos/tratamientos_list.html', context)
 
 
+@login_required
 def tratamiento_create(request):
-    """Create new treatment."""
-    context = get_context_base()
+    """Create new treatment for current user."""
+    context = get_context_base(request)
     
     if request.method == 'POST':
-        form = TratamientoForm(request.POST)
+        form = TratamientoForm(request.POST, user=request.user)
         if form.is_valid():
             tratamiento = form.save(commit=False)
+            tratamiento.usuario = request.user
             
             # Handle first dose configuration
             primera_toma_ahora = request.POST.get('primera_toma_ahora') == 'on'
@@ -244,17 +257,18 @@ def tratamiento_create(request):
             messages.success(request, 'Tratamiento creado correctamente.')
             return redirect('medicamentos:dashboard')
     else:
-        form = TratamientoForm()
+        form = TratamientoForm(user=request.user)
     
     context['form'] = form
     context['title'] = 'Nuevo Tratamiento'
     return render(request, 'medicamentos/tratamiento_form.html', context)
 
 
+@login_required
 def tratamiento_detail(request, pk):
     """View treatment details."""
-    context = get_context_base()
-    tratamiento = get_object_or_404(Tratamiento, pk=pk)
+    context = get_context_base(request)
+    tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)
     
     context['tratamiento'] = tratamiento
     context['status_summary'] = get_treatment_status_summary(tratamiento)
@@ -266,19 +280,20 @@ def tratamiento_detail(request, pk):
     return render(request, 'medicamentos/tratamiento_detail.html', context)
 
 
+@login_required
 def tratamiento_edit(request, pk):
     """Edit treatment."""
-    context = get_context_base()
-    tratamiento = get_object_or_404(Tratamiento, pk=pk)
+    context = get_context_base(request)
+    tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)
     
     if request.method == 'POST':
-        form = TratamientoForm(request.POST, instance=tratamiento)
+        form = TratamientoForm(request.POST, instance=tratamiento, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Tratamiento actualizado correctamente.')
             return redirect('medicamentos:tratamiento_detail', pk=pk)
     else:
-        form = TratamientoForm(instance=tratamiento)
+        form = TratamientoForm(instance=tratamiento, user=request.user)
     
     context['form'] = form
     context['tratamiento'] = tratamiento
@@ -286,9 +301,10 @@ def tratamiento_edit(request, pk):
     return render(request, 'medicamentos/tratamiento_form.html', context)
 
 
+@login_required
 def tratamiento_toggle_pause(request, pk):
     """Toggle treatment pause status."""
-    tratamiento = get_object_or_404(Tratamiento, pk=pk)
+    tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)
     
     if tratamiento.estado == 'activo':
         tratamiento.estado = 'pausado'
@@ -301,9 +317,10 @@ def tratamiento_toggle_pause(request, pk):
     return redirect('medicamentos:tratamiento_detail', pk=pk)
 
 
+@login_required
 def tratamiento_finalizar(request, pk):
     """End a treatment."""
-    tratamiento = get_object_or_404(Tratamiento, pk=pk)
+    tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)
     
     if request.method == 'POST':
         tratamiento.estado = 'finalizado'
@@ -311,14 +328,15 @@ def tratamiento_finalizar(request, pk):
         messages.success(request, 'Tratamiento finalizado.')
         return redirect('medicamentos:dashboard')
     
-    context = get_context_base()
+    context = get_context_base(request)
     context['tratamiento'] = tratamiento
     return render(request, 'medicamentos/tratamiento_confirm_end.html', context)
 
 
+@login_required
 def tratamiento_delete(request, pk):
     """Delete treatment preserving history."""
-    tratamiento = get_object_or_404(Tratamiento, pk=pk)
+    tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)
     
     if request.method == 'POST':
         # Get medication name before potential deletion
@@ -338,25 +356,27 @@ def tratamiento_delete(request, pk):
         messages.success(request, f'Tratamiento de "{nombre_medicamento}" eliminado. El historial de tomas se mantiene.')
         return redirect('medicamentos:tratamientos_list')
     
-    context = get_context_base()
+    context = get_context_base(request)
     context['tratamiento'] = tratamiento
     context['total_tomas'] = tratamiento.tomas.count()
     context['tomas_confirmadas'] = tratamiento.tomas.filter(estado__in=['confirmada', 'tarde']).count()
     return render(request, 'medicamentos/tratamiento_confirm_delete.html', context)
-    return render(request, 'medicamentos/tratamiento_confirm_end.html', context)
 
 
 # ==================== TOMAS ====================
 
+@login_required
 def historial_tomas(request):
-    """View all dose history."""
-    context = get_context_base()
+    """View all dose history for current user."""
+    context = get_context_base(request)
     
     # Filter options
     estado_filter = request.GET.get('estado', '')
     medicamento_filter = request.GET.get('medicamento', '')
     
-    tomas = Toma.objects.select_related(
+    tomas = Toma.objects.filter(
+        tratamiento__usuario=request.user
+    ).select_related(
         'tratamiento', 'tratamiento__medicamento'
     ).order_by('-hora_programada')
     
@@ -367,17 +387,18 @@ def historial_tomas(request):
         tomas = tomas.filter(tratamiento__medicamento_id=medicamento_filter)
     
     context['tomas'] = tomas[:100]  # Limit to 100 most recent
-    context['medicamentos'] = Medicamento.objects.filter(activo=True)
+    context['medicamentos'] = Medicamento.objects.filter(usuario=request.user, activo=True)
     context['estado_filter'] = estado_filter
     context['medicamento_filter'] = medicamento_filter
     
     return render(request, 'medicamentos/historial_tomas.html', context)
 
 
+@login_required
 def historial_tratamiento(request, tratamiento_pk):
     """View dose history for specific treatment."""
-    context = get_context_base()
-    tratamiento = get_object_or_404(Tratamiento, pk=tratamiento_pk)
+    context = get_context_base(request)
+    tratamiento = get_object_or_404(Tratamiento, pk=tratamiento_pk, usuario=request.user)
     
     context['tratamiento'] = tratamiento
     context['tomas'] = Toma.objects.filter(
@@ -388,21 +409,22 @@ def historial_tratamiento(request, tratamiento_pk):
     return render(request, 'medicamentos/historial_tratamiento.html', context)
 
 
+@login_required
 def confirmar_toma(request, pk):
     """Confirm a dose."""
-    toma = get_object_or_404(Toma, pk=pk)
+    toma = get_object_or_404(Toma, pk=pk, tratamiento__usuario=request.user)
     
     if request.method == 'POST':
         result = confirm_dose_util(toma)
         
         if result['was_on_time']:
-            messages.success(request, '?Toma confirmada a tiempo!')
+            messages.success(request, '¡Toma confirmada a tiempo!')
         else:
-            messages.warning(request, 'Toma confirmada (tard??a).')
+            messages.warning(request, 'Toma confirmada (tardía).')
         
         return redirect('medicamentos:dashboard')
     
-    context = get_context_base()
+    context = get_context_base(request)
     context['toma'] = toma
     context['window_status'] = check_confirmation_window(toma)
     
@@ -411,12 +433,14 @@ def confirmar_toma(request, pk):
 
 # ==================== CALENDARIO ====================
 
+@login_required
 def calendario(request):
     """Calendar view."""
-    context = get_context_base()
+    context = get_context_base(request)
     return render(request, 'medicamentos/calendario.html', context)
 
 
+@login_required
 def calendario_datos(request):
     """API endpoint for calendar data."""
     start_str = request.GET.get('start')
@@ -431,8 +455,9 @@ def calendario_datos(request):
     
     events = []
     
-    # Get registered doses
+    # Get registered doses for current user
     tomas = Toma.objects.filter(
+        tratamiento__usuario=request.user,
         hora_programada__date__range=(start_date, end_date)
     ).select_related('tratamiento', 'tratamiento__medicamento')
     
@@ -453,18 +478,19 @@ def calendario_datos(request):
     return JsonResponse(events, safe=False)
 
 
-# ==================== CONFIGURACI??N ====================
+# ==================== CONFIGURACIÓN ====================
 
+@login_required
 def configuracion(request):
     """User configuration view."""
-    context = get_context_base()
-    config = get_user_config()
+    context = get_context_base(request)
+    config = get_user_config(request.user)
     
     if request.method == 'POST':
         form = ConfiguracionForm(request.POST, instance=config)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Configuraci??n guardada.')
+            messages.success(request, 'Configuración guardada.')
             return redirect('medicamentos:configuracion')
     else:
         form = ConfiguracionForm(instance=config)
@@ -475,12 +501,13 @@ def configuracion(request):
 
 # ==================== TELEGRAM ====================
 
+@login_required
 def telegram_vincular(request):
     """Link Telegram account."""
     from .utils.telegram_bot import get_bot_updates, send_welcome_message, verify_bot_token
     
-    context = get_context_base()
-    config = get_user_config()
+    context = get_context_base(request)
+    config = get_user_config(request.user)
     
     # Verify bot is working
     bot_info = verify_bot_token()
@@ -522,7 +549,7 @@ def telegram_vincular(request):
 def telegram_desvincular(request):
     """Unlink Telegram account."""
     if request.method == 'POST':
-        config = get_user_config()
+        config = get_user_config(request.user)
         config.telegram_chat_id = None
         config.telegram_activo = False
         config.telegram_vinculado = None
@@ -533,11 +560,12 @@ def telegram_desvincular(request):
     return redirect('medicamentos:configuracion')
 
 
+@login_required
 def telegram_test(request):
     """Send test message to linked Telegram."""
     from .utils.telegram_bot import send_telegram_message
     
-    config = get_user_config()
+    config = get_user_config(request.user)
     
     if config.telegram_chat_id and config.telegram_activo:
         result = send_telegram_message(
@@ -557,11 +585,15 @@ def telegram_test(request):
     return redirect('medicamentos:configuracion')
 
 
-@csrf_exempt
+@login_required
 def api_telegram_check_reminders(request):
     """
-    API endpoint to check and send Telegram reminders.
+    API endpoint to check and send Telegram reminders for the logged-in user.
     Called periodically by JavaScript (every 60 seconds).
+    
+    Note: The main reminder service (telegram_reminder_service.py) handles 
+    reminders for all users independently. This endpoint is a backup for
+    users who have the browser open.
     
     Logic:
     - 5 minutes before: Send advance reminder if user has option enabled
@@ -570,7 +602,7 @@ def api_telegram_check_reminders(request):
     from .utils.telegram_bot import send_dose_reminder, send_upcoming_reminder
     
     now = timezone.now()
-    config = get_user_config()
+    config = get_user_config(request.user)
     
     # Check if Telegram is configured
     if not config or not config.telegram_activo or not config.telegram_chat_id:
@@ -583,11 +615,12 @@ def api_telegram_check_reminders(request):
     chat_id = config.telegram_chat_id
     enviar_anticipado = config.recordatorio_anticipado  # 5 min antes
     
-    # Get pending doses for the next 10 minutes
+    # Get pending doses for the current user for the next 10 minutes
     fecha_inicio = now - timedelta(minutes=2)  # Small buffer for exact time
     fecha_limite = now + timedelta(minutes=10)
     
     tomas_pendientes = Toma.objects.filter(
+        tratamiento__usuario=request.user,  # Filter by current user
         estado='pendiente',
         hora_programada__gte=fecha_inicio,
         hora_programada__lte=fecha_limite
@@ -683,13 +716,15 @@ def api_telegram_check_reminders(request):
 
 # ==================== BACKUPS ====================
 
+@login_required
 def backup_list(request):
     """List available backups."""
-    context = get_context_base()
+    context = get_context_base(request)
     context['backups'] = list_backups()
     return render(request, 'medicamentos/backup_list.html', context)
 
 
+@login_required
 def backup_create(request):
     """Create new backup."""
     if request.method == 'POST':
@@ -702,6 +737,7 @@ def backup_create(request):
     return redirect('medicamentos:backup_list')
 
 
+@login_required
 def backup_restore(request, filename):
     """Restore from backup."""
     backup_dir = get_backup_directory()
@@ -715,11 +751,12 @@ def backup_restore(request, filename):
             messages.error(request, f'Error: {result.get("error", "Unknown error")}')
         return redirect('medicamentos:backup_list')
     
-    context = get_context_base()
+    context = get_context_base(request)
     context['filename'] = filename
     return render(request, 'medicamentos/backup_confirm_restore.html', context)
 
 
+@login_required
 def backup_delete(request, filename):
     """Delete a backup."""
     if request.method == 'POST':
@@ -735,6 +772,7 @@ def backup_delete(request, filename):
     return redirect('medicamentos:backup_list')
 
 
+@login_required
 def backup_download(request, filename):
     """Download a backup file."""
     backup_dir = get_backup_directory()
@@ -753,11 +791,12 @@ def backup_download(request, filename):
 
 # ==================== API ENDPOINTS ====================
 
+@login_required
 def api_proximas_tomas(request):
     """API: Get upcoming doses for 7 days (for pillbox visualization)."""
-    validate_and_update_doses()
+    validate_and_update_doses(request.user)
     
-    treatments = Tratamiento.objects.filter(estado='activo')
+    treatments = Tratamiento.objects.filter(usuario=request.user, estado='activo')
     doses_data = []
     
     # Get doses for next 7 days
@@ -800,20 +839,22 @@ def api_proximas_tomas(request):
 
 
 @csrf_exempt
+@login_required
 def api_confirmar_toma(request, pk):
     """API: Confirm a dose."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    toma = get_object_or_404(Toma, pk=pk)
+    toma = get_object_or_404(Toma, pk=pk, tratamiento__usuario=request.user)
     result = confirm_dose_util(toma)
     
     return JsonResponse(result)
 
 
+@login_required
 def api_notificaciones_pendientes(request):
     """API: Get pending notifications."""
-    schedule = get_notification_schedule()
+    schedule = get_notification_schedule(request.user)
     
     notifications = []
     for item in schedule:
@@ -828,9 +869,10 @@ def api_notificaciones_pendientes(request):
     return JsonResponse({'notifications': notifications})
 
 
+@login_required
 def api_actualizar_estados(request):
     """API: Update dose statuses (called periodically)."""
-    result = validate_and_update_doses()
+    result = validate_and_update_doses(request.user)
     return JsonResponse(result)
 
 

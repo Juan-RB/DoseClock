@@ -1,0 +1,168 @@
+{% extends 'medicamentos/base.html' %}
+
+{% block title %}Mi Perfil - DoseClock{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'medicamentos:dashboard' %}" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="h3 mb-0">Mi Perfil</h1>
+                    <p class="text-muted mb-0">Administra tu información personal</p>
+                </div>
+            </div>
+            
+            <!-- Alerts -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Profile Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center me-3" 
+                             style="width: 60px; height: 60px; font-size: 1.5rem;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-0">{{ perfil.nombre_completo }}</h5>
+                            <small class="opacity-75">@{{ request.user.username }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Nombre Completo -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="id_nombre_completo">
+                                    <i class="bi bi-person-badge me-1 text-primary"></i> Nombre completo
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control {% if form.nombre_completo.errors %}is-invalid{% endif %}"
+                                    id="id_nombre_completo"
+                                    name="nombre_completo"
+                                    value="{{ form.nombre_completo.value|default:perfil.nombre_completo }}"
+                                    required
+                                >
+                                {% if form.nombre_completo.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.nombre_completo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Edad -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="id_edad">
+                                    <i class="bi bi-calendar-heart me-1 text-primary"></i> Edad
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control {% if form.edad.errors %}is-invalid{% endif %}"
+                                    id="id_edad"
+                                    name="edad"
+                                    value="{{ form.edad.value|default:perfil.edad }}"
+                                    min="1"
+                                    max="120"
+                                    required
+                                >
+                                {% if form.edad.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.edad.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="id_email">
+                                    <i class="bi bi-envelope me-1 text-primary"></i> Correo electrónico
+                                </label>
+                                <input 
+                                    type="email" 
+                                    class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                    id="id_email"
+                                    name="email"
+                                    value="{{ form.email.value|default:request.user.email }}"
+                                    placeholder="correo@ejemplo.com (opcional)"
+                                >
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Username (read-only) -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="username_display">
+                                    <i class="bi bi-at me-1 text-primary"></i> Nombre de usuario
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    id="username_display"
+                                    value="{{ request.user.username }}"
+                                    readonly
+                                    disabled
+                                >
+                                <small class="text-muted">El nombre de usuario no se puede cambiar</small>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                Miembro desde: {{ perfil.fecha_creacion|date:"d/m/Y" }}
+                            </small>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Account Info Card -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-shield-lock me-2"></i> Seguridad de la cuenta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Contraseña</strong>
+                            <p class="text-muted mb-0 small">Última actualización: desconocida</p>
+                        </div>
+                        <a href="#" class="btn btn-outline-secondary btn-sm disabled">
+                            <i class="bi bi-key me-1"></i> Cambiar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
