@@ -1,4 +1,5 @@
 {% extends 'accounts/base_auth.html' %}
+{% load static %}
 
 {% block title %}Iniciar Sesion - DoseClock{% endblock %}
 
@@ -7,10 +8,7 @@
     <div class="auth-card glass-card">
         <!-- Logo -->
         <div class="auth-logo">
-            <div class="logo-icon">
-                <i class="bi bi-capsule"></i>
-            </div>
-            <h1>DoseClock</h1>
+            <img src="{% static 'icons/logo.png' %}" alt="DoseClock Logo" class="logo-img" style="max-width: 200px; height: auto; margin-bottom: 15px;">
             <p>Tu asistente de medicamentos</p>
         </div>
         

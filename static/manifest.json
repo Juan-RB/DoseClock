@@ -1,7 +1,7 @@
 ﻿{
   "name": "DoseClock",
   "short_name": "DoseClock",
-  "description": "Aplicación de gestión y recordatorio de medicamentos",
+  "description": "Gestion de medicamentos y recordatorios",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f9fa",
@@ -9,6 +9,12 @@
   "orientation": "portrait-primary",
   "lang": "es",
   "icons": [
+    {
+      "src": "/static/icons/icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "/static/icons/icon-72.png",
       "sizes": "72x72",
@@ -28,26 +34,14 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/static/icons/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-152.png",
-      "sizes": "152x152",
+      "src": "/static/icons/icon-180.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
       "src": "/static/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/static/icons/icon-384.png",
-      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any maskable"
     },
