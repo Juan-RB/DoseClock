@@ -84,7 +84,41 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.WARNING('Regular user already exists'))
         
-        # 3. Migrate existing data to regular user
+        # 3. Create juan_1 user (main user)
+        juan_user, created = User.objects.get_or_create(
+            username='juan_1',
+            defaults={
+                'email': 'juan@doseclock.local',
+                'is_staff': False,
+                'is_superuser': False
+            }
+        )
+        if created:
+            juan_user.set_password(user_password)
+            juan_user.save()
+            PerfilUsuario.objects.update_or_create(
+                user=juan_user,
+                defaults={
+                    'nombre_completo': 'Juan',
+                    'edad': 25
+                }
+            )
+            # Create configuration for juan_1
+            ConfiguracionUsuario.objects.get_or_create(
+                usuario=juan_user,
+                defaults={
+                    'modo_visual': 'minimalista',
+                    'paleta_colores': 'nude',
+                    'telegram_activo': False
+                }
+            )
+            self.stdout.write(self.style.SUCCESS(
+                f'✅ Juan user created: juan_1 / {user_password}'
+            ))
+        else:
+            self.stdout.write(self.style.WARNING('juan_1 user already exists'))
+        
+        # 4. Migrate existing data to regular user
         self.stdout.write(self.style.NOTICE('Migrating existing data...'))
         
         # Migrate medications without owner
@@ -126,8 +160,9 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS('\n✅ Setup complete!'))
         self.stdout.write(self.style.NOTICE('\nCredentials:'))
-        self.stdout.write(f'  Admin: admin / {admin_password}')
-        self.stdout.write(f'  User:  usuario / {user_password}')
+        self.stdout.write(f'  Admin:  admin / {admin_password}')
+        self.stdout.write(f'  User:   usuario / {user_password}')
+        self.stdout.write(f'  Juan:   juan_1 / {user_password}')
         self.stdout.write(self.style.WARNING(
             '\n⚠️  Remember to change these passwords in production!'
         ))
