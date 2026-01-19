@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/notificaciones-pendientes/', views.api_notificaciones_pendientes, name='api_notificaciones_pendientes'),
     path('api/actualizar-estados/', views.api_actualizar_estados, name='api_actualizar_estados'),
     path('api/telegram/check-reminders/', views.api_telegram_check_reminders, name='api_telegram_check_reminders'),
+    path('api/cron/telegram-reminders/', views.api_cron_telegram_reminders, name='api_cron_telegram_reminders'),
     
     # Service Worker
     path('sw.js', views.service_worker, name='service_worker'),

@@ -3,6 +3,7 @@ Views for DoseClock application.
 All views use functional approach as per project requirements.
 """
 
+import os
 import json
 from datetime import datetime, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
@@ -712,6 +713,118 @@ def api_telegram_check_reminders(request):
             'total': enviados_anticipados + enviados_exactos
         },
         'detalles': resultados
+    })
+
+
+@csrf_exempt
+def api_cron_telegram_reminders(request):
+    """
+    Public API endpoint for external cron services (cron-job.org, UptimeRobot, etc.)
+    to trigger Telegram reminders for ALL users.
+    
+    Requires a secret key in the request for security.
+    Configure CRON_SECRET_KEY in environment variables.
+    
+    Usage: GET or POST to /api/cron/telegram-reminders/?key=YOUR_SECRET_KEY
+    """
+    from .utils.telegram_bot import send_dose_reminder, send_upcoming_reminder
+    
+    # Verify secret key
+    secret_key = request.GET.get('key') or request.POST.get('key')
+    expected_key = os.environ.get('CRON_SECRET_KEY', 'doseclock-cron-2024')
+    
+    if secret_key != expected_key:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid or missing secret key'
+        }, status=403)
+    
+    now = timezone.now()
+    
+    # Get all user configurations with active Telegram
+    configs = ConfiguracionUsuario.objects.filter(
+        telegram_activo=True,
+        telegram_chat_id__isnull=False
+    ).exclude(telegram_chat_id='').select_related('usuario')
+    
+    total_anticipados = 0
+    total_exactos = 0
+    usuarios_procesados = 0
+    
+    for config in configs:
+        if not config.usuario:
+            continue
+            
+        usuarios_procesados += 1
+        chat_id = config.telegram_chat_id
+        enviar_anticipado = config.recordatorio_anticipado
+        
+        # Get pending doses for this user
+        fecha_inicio = now - timedelta(minutes=2)
+        fecha_limite = now + timedelta(minutes=10)
+        
+        tomas_pendientes = Toma.objects.filter(
+            tratamiento__usuario=config.usuario,
+            estado='pendiente',
+            hora_programada__gte=fecha_inicio,
+            hora_programada__lte=fecha_limite
+        ).select_related('tratamiento', 'tratamiento__medicamento')
+        
+        for toma in tomas_pendientes:
+            if not toma.tratamiento or not toma.tratamiento.medicamento:
+                continue
+            
+            nombre_medicamento = toma.nombre_medicamento
+            hora_toma = toma.hora_programada
+            minutos_hasta_toma = (hora_toma - now).total_seconds() / 60
+            
+            # 5-minute advance reminder
+            if enviar_anticipado and 4 <= minutos_hasta_toma <= 6:
+                notif_anticipada = Notificacion.objects.filter(
+                    toma=toma, tipo='recordatorio', enviada=True
+                ).exists()
+                
+                if not notif_anticipada:
+                    result = send_upcoming_reminder(chat_id, nombre_medicamento, 5)
+                    if result.get('success'):
+                        Notificacion.objects.create(
+                            toma=toma,
+                            tipo='recordatorio',
+                            hora_programada=hora_toma - timedelta(minutes=5),
+                            enviada=True,
+                            fecha_envio=now
+                        )
+                        total_anticipados += 1
+            
+            # Exact time reminder
+            if -2 <= minutos_hasta_toma <= 2:
+                notif_principal = Notificacion.objects.filter(
+                    toma=toma, tipo='principal', enviada=True
+                ).exists()
+                
+                if not notif_principal:
+                    result = send_dose_reminder(
+                        chat_id, nombre_medicamento, hora_toma, str(toma.id)
+                    )
+                    if result.get('success'):
+                        Notificacion.objects.create(
+                            toma=toma,
+                            tipo='principal',
+                            hora_programada=hora_toma,
+                            enviada=True,
+                            fecha_envio=now
+                        )
+                        total_exactos += 1
+    
+    return JsonResponse({
+        'success': True,
+        'timestamp': now.isoformat(),
+        'usuarios_procesados': usuarios_procesados,
+        'reminders_sent': {
+            'anticipados': total_anticipados,
+            'exactos': total_exactos,
+            'total': total_anticipados + total_exactos
+        }
     })
 
 
