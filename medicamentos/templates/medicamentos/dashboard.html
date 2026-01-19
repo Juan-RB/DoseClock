@@ -286,6 +286,7 @@
           <p class="text-muted small mb-1">Proxima toma en:</p>
           <div class="countdown-display h2 mb-0 font-monospace"
                id="countdown-{{ card.dose.id }}"
+               data-target-time="{{ card.next_dose.isoformat }}"
                data-seconds="{{ card.time_info.total_seconds }}">
             {{ card.countdown }}
           </div>

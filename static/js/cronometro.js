@@ -1,18 +1,55 @@
 ﻿/**
  * DoseClock - Countdown Timer Module
- * Handles countdown displays and updates
+ * Handles countdown displays and updates using absolute time synchronization
  */
 
 // Store countdown intervals
 const countdownIntervals = new Map();
 
+// Server time offset (difference between server and client time in ms)
+let serverTimeOffset = 0;
+
+/**
+ * Calculate the offset between server time and client time
+ * This corrects for timezone differences and clock drift
+ */
+function calculateServerOffset() {
+  const serverTimeMeta = document.querySelector('meta[name="server-time"]');
+  if (serverTimeMeta) {
+    const serverTime = new Date(serverTimeMeta.content);
+    const clientTime = new Date();
+    serverTimeOffset = serverTime.getTime() - clientTime.getTime();
+    console.log(`Server time offset: ${serverTimeOffset}ms (${Math.round(serverTimeOffset/1000)}s)`);
+  }
+}
+
+/**
+ * Get the current time adjusted for server offset
+ * @returns {Date} Current time synchronized with server
+ */
+function getSyncedNow() {
+  return new Date(Date.now() + serverTimeOffset);
+}
+
 /**
  * Initialize all countdowns on the page
  */
 function initializeCountdowns() {
-  const countdownElements = document.querySelectorAll('[data-seconds]');
+  // Calculate server time offset first
+  calculateServerOffset();
+  
+  const countdownElements = document.querySelectorAll('[data-target-time]');
   
   countdownElements.forEach(element => {
+    const targetTime = element.dataset.targetTime;
+    if (targetTime) {
+      startCountdownAbsolute(element, targetTime);
+    }
+  });
+  
+  // Fallback for elements with only data-seconds (legacy support)
+  const legacyElements = document.querySelectorAll('[data-seconds]:not([data-target-time])');
+  legacyElements.forEach(element => {
     const seconds = parseInt(element.dataset.seconds, 10);
     if (!isNaN(seconds)) {
       startCountdown(element, seconds);
@@ -21,52 +58,72 @@ function initializeCountdowns() {
 }
 
 /**
- * Start a countdown timer for an element
+ * Start a countdown timer using absolute target time
  * @param {HTMLElement} element - The countdown display element
- * @param {number} initialSeconds - Starting seconds
+ * @param {string} targetTimeISO - ISO timestamp of the target time
  */
-function startCountdown(element, initialSeconds) {
-  const elementId = element.id;
+function startCountdownAbsolute(element, targetTimeISO) {
+  const elementId = element.id || `countdown-${Date.now()}`;
+  element.id = elementId;
   
   // Clear existing interval if any
   if (countdownIntervals.has(elementId)) {
     clearInterval(countdownIntervals.get(elementId));
   }
   
-  let remainingSeconds = initialSeconds;
+  const targetTime = new Date(targetTimeISO);
   
-  // Update display immediately
-  updateCountdownDisplay(element, remainingSeconds);
-  
-  // Set interval for updates
-  const intervalId = setInterval(() => {
-    remainingSeconds--;
+  // Update function that calculates remaining time from current moment
+  function updateFromAbsoluteTime() {
+    const now = getSyncedNow();
+    const remainingMs = targetTime.getTime() - now.getTime();
+    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+    
+    updateCountdownDisplay(element, remainingSeconds);
     
     if (remainingSeconds <= 0) {
-      clearInterval(intervalId);
+      clearInterval(countdownIntervals.get(elementId));
       countdownIntervals.delete(elementId);
       handleCountdownComplete(element);
-    } else {
-      updateCountdownDisplay(element, remainingSeconds);
     }
-  }, 1000);
+  }
   
+  // Update immediately
+  updateFromAbsoluteTime();
+  
+  // Set interval for updates (every second)
+  const intervalId = setInterval(updateFromAbsoluteTime, 1000);
   countdownIntervals.set(elementId, intervalId);
 }
 
 /**
- * Update all countdowns (called every second from dashboard)
+ * Start a countdown timer for an element (legacy - uses relative seconds)
+ * Prefer startCountdownAbsolute for accurate timing
+ * @param {HTMLElement} element - The countdown display element
+ * @param {number} initialSeconds - Starting seconds
+ */
+function startCountdown(element, initialSeconds) {
+  // Convert to absolute time and use the accurate method
+  const targetTime = new Date(getSyncedNow().getTime() + (initialSeconds * 1000));
+  startCountdownAbsolute(element, targetTime.toISOString());
+}
+
+/**
+ * Update all countdowns (called for manual refresh)
+ * With absolute timing, this recalculates from current time
  */
 function updateCountdowns() {
-  const countdownElements = document.querySelectorAll('.countdown-display');
+  const countdownElements = document.querySelectorAll('[data-target-time]');
   
   countdownElements.forEach(element => {
-    const currentSeconds = parseInt(element.dataset.currentSeconds, 10) || 0;
-    
-    if (currentSeconds > 0) {
-      const newSeconds = currentSeconds - 1;
-      element.dataset.currentSeconds = newSeconds;
-      updateCountdownDisplay(element, newSeconds);
+    const targetTime = element.dataset.targetTime;
+    if (targetTime) {
+      const target = new Date(targetTime);
+      const now = getSyncedNow();
+      const remainingMs = target.getTime() - now.getTime();
+      const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+      
+      updateCountdownDisplay(element, remainingSeconds);
     }
   });
 }

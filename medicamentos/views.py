@@ -52,6 +52,7 @@ def get_context_base(request):
         'paleta': config.paleta_colores if config else 'nude',
         'tamano_texto': config.tamano_texto if config else 'normal',
         'alto_contraste': config.alto_contraste if config else False,
+        'server_time_iso': timezone.now().isoformat(),
     }
 
 
