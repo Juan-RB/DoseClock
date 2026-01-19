@@ -839,17 +839,19 @@ def api_proximas_tomas(request):
     return JsonResponse({'doses': doses_data})
 
 
-@csrf_exempt
 @login_required
+@csrf_exempt
 def api_confirmar_toma(request, pk):
     """API: Confirm a dose."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    toma = get_object_or_404(Toma, pk=pk, tratamiento__usuario=request.user)
-    result = confirm_dose_util(toma)
-    
-    return JsonResponse(result)
+    try:
+        toma = get_object_or_404(Toma, pk=pk, tratamiento__usuario=request.user)
+        result = confirm_dose_util(toma)
+        return JsonResponse(result)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @login_required
